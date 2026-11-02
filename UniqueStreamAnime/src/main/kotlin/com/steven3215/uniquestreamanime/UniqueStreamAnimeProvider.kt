@@ -109,10 +109,10 @@ class UniqueStreamAnimeProvider : MainAPI() {
                 val episodes = pageItems(get("season/$seasonId/episodes?page=$page&limit=${UniqueStreamProtocol.PAGE_SIZE}&order_by=asc"))
                 var added = 0
                 for (entry in episodes) {
-                    if (entry.get("is_clip")?.asBoolean() == true) continue
                     val id = entry.text("content_id")?.takeIf { UniqueStreamProtocol.validId(it) } ?: continue
                     if (!seen.add(id)) continue
                     added++
+                    if (entry.get("is_clip")?.asBoolean() == true) continue
                     val locales = entry.items("audio_locales").map { it.asText() }
                     fun episode(locale: String): Episode = newEpisode("$mainUrl/watch/$id/details?audio=$locale") {
                         this.name = entry.text("title")
@@ -154,14 +154,14 @@ class UniqueStreamAnimeProvider : MainAPI() {
         val primary = media.get("hls")?.takeUnless { it.isNull }
         val versions = listOfNotNull(primary) + media.get("versions")?.items("hls").orEmpty()
         val selection = if (item.audio == "all") versions else {
-            versions.filter { it.text("locale") == requested }.ifEmpty { listOfNotNull(primary) }
+            versions.filter { it.text("locale") == requested }
         }
         val seen = mutableSetOf<String>()
         val subtitles = mutableSetOf<String>()
         for (version in selection) {
             val playlist = version.text("playlist")?.takeIf { UniqueStreamProtocol.isWebUrl(it) } ?: continue
-            if (!seen.add(playlist)) continue
             val mediaId = UniqueStreamProtocol.mediaId(playlist, media.text("media_id")) ?: continue
+            if (!seen.add(playlist)) continue
             val locale = version.text("locale") ?: requested
             callback(newExtractorLink(name, "$name [$locale]", playlist, ExtractorLinkType.M3U8) {
                 referer = "$mainUrl/"
