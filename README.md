@@ -2,6 +2,15 @@
 
 Cloudstream extensions for Steven3215.
 
+## Sportsbite
+
+Live sports schedule provider for https://sportsbite.org/. Includes live/upcoming
+event browsing, search, per-event servers and supported HLS player resolution.
+Image-container media segments use the website's transport format, decoded by a
+local playback interceptor. Device testing is pending; beta-only.
+Casting is unsupported. Upcoming events, offline servers, unsupported iframe-only
+players and events removed from the current schedule may have no playable links.
+
 ## UniqueStream Anime
 
 Provider for https://anime.uniquestream.net/ with catalog/search, anime movies,

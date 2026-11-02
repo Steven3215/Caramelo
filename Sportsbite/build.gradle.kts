@@ -1,0 +1,13 @@
+version = 1
+cloudstream {
+    description = "Sportsbite live sports schedule and supported HLS servers. Device testing pending."
+    authors = listOf("Steven3215")
+    status = 3
+    tvTypes = listOf("Live")
+    language = "en"
+}
+dependencies {
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    testImplementation("junit:junit:4.13.2")
+}
