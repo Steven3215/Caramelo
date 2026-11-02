@@ -1,0 +1,8 @@
+{
+  "name": "Steven's Cloudstream Providers",
+  "description": "Cinema Army movies and TV shows",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/Steven3215/cloudstream-providers/main/plugins.json"
+  ]
+}
