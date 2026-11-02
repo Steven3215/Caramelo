@@ -1,6 +1,6 @@
 {
   "name": "Steven's Cloudstream Providers",
-  "description": "Cinema Army and UniqueStream Anime extensions",
+  "description": "Cinema Army, UniqueStream Anime and Sportsbite extensions",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/Steven3215/cloudstream-providers/main/plugins.json"

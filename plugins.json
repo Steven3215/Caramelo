@@ -38,5 +38,24 @@
     "language": "en",
     "fileSize": 24933,
     "fileHash": "sha256-e3ee41a86ed74df0084ce232ffdc201904c075c2a3f57b743b55928108b459d5"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/cloudstream-providers/main/downloads/Sportsbite.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "Sportsbite",
+    "internalName": "Sportsbite",
+    "authors": [
+      "Steven3215"
+    ],
+    "description": "Live sports schedule and supported HLS servers. Local playback only; device testing pending.",
+    "repositoryUrl": "https://github.com/Steven3215/cloudstream-providers",
+    "tvTypes": [
+      "Live"
+    ],
+    "language": "en",
+    "fileSize": 25398,
+    "fileHash": "sha256-845a7ccef45ecd6dd59df4cac4ef348d676b0b222650344181cc364252761189"
   }
 ]

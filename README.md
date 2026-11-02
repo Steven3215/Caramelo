@@ -48,7 +48,7 @@ Open **Settings → Extensions → Add repository** and enter the case-sensitive
 ```
 
 Keep the leading exclamation mark. Then open **Steven's Cloudstream Providers**
-and install **Cinema Army** or **UniqueStream Anime**. The provider is currently marked beta-only; use the
+and install **Cinema Army**, **UniqueStream Anime**, or **Sportsbite**. The provider is currently marked beta-only; use the
 Cloudstream prerelease build if it is unavailable in the stable app.
 
 Full repository URL (fallback):
