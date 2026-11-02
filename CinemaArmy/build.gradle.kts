@@ -1,9 +1,13 @@
-version = 1
+version = 2
 
 cloudstream {
-    description = "Cinema Army provider skeleton. Search and playback are not implemented."
+    description = "Cinema Army movies and TV shows. Initial implementation; device testing pending."
     authors = listOf("Steven3215")
-    status = 0
-    tvTypes = listOf("Movie")
+    status = 3
+    tvTypes = listOf("Movie", "TvSeries")
     language = "en"
+}
+
+dependencies {
+    testImplementation("junit:junit:4.13.2")
 }

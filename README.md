@@ -1,49 +1,50 @@
 # Cloudstream providers
 
-Private Cloudstream extension development repository for Steven3215.
+Private Cloudstream extensions for Steven3215.
 
-## Current status
+## Cinema Army
 
-Cinema Army (https://cinema.army/movies) is the first target. The module is a
-**nonfunctional skeleton**, marked status 0 (down). Search, movie details,
-and playback extraction are not implemented. Do not treat it as a working provider.
+Initial implementation for https://cinema.army:
+- Trending, popular and top-rated movies; popular TV shows.
+- Search, posters, descriptions, genres, ratings, seasons and episodes.
+- Four playback servers with per-server failure handling and the site's normal stream-token protocol.
+- Plain and encoded HLS URLs, with optional subtitles from the service used by the website.
 
-The site renders in a browser using JavaScript. Its catalog requests, identifiers,
-pagination, and player behavior still need to be verified before implementation.
-No authentication secrets are stored in this project.
+The provider is marked **beta-only (status 3)** until it has been tested on a device.
+A catalog entry does not guarantee that any server has a playable stream.
+Search uses the site's single-page search endpoint. Trending/top-rated rows are
+single-page; popular rows use the API's reported pagination. Seasons that fail to
+load are skipped so available seasons remain usable.
 
-## Build
+Protocol values come from the site's publicly served JavaScript. If the site
+changes its API or encoding, the provider may need updating. No GitHub credentials
+or personal account secrets are embedded.
 
-The build configuration is adapted from the public-domain
-[Cloudstream TestPlugins template](https://github.com/recloudstream/TestPlugins).
-It uses Java 17, Android SDK 35, and Gradle 8.12.
+## Build and install
 
-In GitHub, open **Actions → Build private extension artifact → Run workflow**.
-The workflow is manual only. It uploads a private artifact retained for seven days;
-it does not create public releases or publish a repository feed.
+Open **Actions → Build private extension artifact**. Builds run on relevant pushes
+and can also be started with **Run workflow**. After a successful run, download the
+**CinemaArmy** artifact, unzip it, and install the .cs3 file using Cloudstream's
+local extension installation mechanism. Artifacts expire after seven days.
 
-For a local build with Java 17, Android SDK 35 and Gradle 8.12 installed:
+The workflow runs unit tests, compiles the provider and uploads the private artifact.
+A separate non-blocking live smoke check tests catalog/search/details/TV episodes
+and an HLS playlist for Night of the Living Dead (1968). Its outcome is visible
+in the workflow log. This does not replace on-device playback testing.
+
+Local prerequisites: Java 17, Android SDK 35 and Gradle 8.12 (no wrapper included).
 
 ```text
-gradle CinemaArmy:make
+gradle CinemaArmy:testDebugUnitTest CinemaArmy:make
+python3 tools/smoke_cinema.py
 ```
 
-No Gradle wrapper is included. Build and on-device behavior have not yet been validated.
-Cloudstream's upstream Gradle plugin and API dependencies are moving versions.
+## Privacy and source
 
-## Private distribution
+The repository and build artifacts remain private. There is no public release,
+builds branch, or repo.json feed. A private GitHub raw URL cannot be used as an
+unauthenticated Cloudstream repository feed. Never embed a GitHub token into a URL.
 
-A private GitHub raw URL cannot serve as a normal unauthenticated Cloudstream
-repository feed. Download compiled .cs3 files from an authenticated GitHub session
-and use Cloudstream's local extension installation mechanism on your device.
-
-No repo.json or public builds branch is provided. Never put GitHub tokens into
-repository URLs or extension source files.
-
-## Remaining provider work
-
-- Verify the site's catalog and search requests and response schema.
-- Implement search and movie detail loading using observed site behavior.
-- Implement supported playback extraction and subtitle handling.
-- Compile and test search, details, and playback on Cloudstream.
-- Enable the provider only after those checks pass.
+Build configuration is based on the public-domain
+[Cloudstream TestPlugins template](https://github.com/recloudstream/TestPlugins).
+Upstream Gradle/API dependencies use moving versions.
