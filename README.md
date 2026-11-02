@@ -1,6 +1,6 @@
 # Cloudstream providers
 
-Private Cloudstream extensions for Steven3215.
+Cloudstream extensions for Steven3215.
 
 ## Cinema Army
 
@@ -20,17 +20,35 @@ Protocol values come from the site's publicly served JavaScript. If the site
 changes its API or encoding, the provider may need updating. No GitHub credentials
 or personal account secrets are embedded.
 
-## Build and install
+## Install in Cloudstream
 
-Open **Actions → Build private extension artifact**. Builds run on relevant pushes
-and can also be started with **Run workflow**. After a successful run, download the
-**CinemaArmy** artifact, unzip it, and install the .cs3 file using Cloudstream's
-local extension installation mechanism. Artifacts expire after seven days.
+Open **Settings → Extensions → Add repository** and enter the case-sensitive shortcode:
 
-The workflow runs unit tests, compiles the provider and uploads the private artifact.
-A separate non-blocking live smoke check tests catalog/search/details/TV episodes
-and an HLS playlist for Night of the Living Dead (1968). Its outcome is visible
-in the workflow log. This does not replace on-device playback testing.
+```text
+!WYx67
+```
+
+Keep the leading exclamation mark. Then open **Steven's Cloudstream Providers**
+and install **Cinema Army**. The provider is currently marked beta-only; use the
+Cloudstream prerelease build if it is unavailable in the stable app.
+
+Full repository URL (fallback):
+
+https://raw.githubusercontent.com/Steven3215/cloudstream-providers/main/repo.json
+
+The shortcode redirects directly to this feed. Compiled downloads are published
+under downloads/ and verified using the SHA-256 checksum in plugins.json.
+
+## Build and release updates
+
+The GitHub Actions build workflow runs unit tests and packages a .cs3 artifact.
+It also runs a non-blocking live API and HLS playlist check using Night of the
+Living Dead (1968). Artifacts expire after seven days.
+
+To publish a new version, replace downloads/CinemaArmy.cs3 and update its version,
+fileSize and fileHash in plugins.json together. The feed URL and shortcode remain
+unchanged. The current build workflow produces artifacts; it does not automatically
+replace the published download.
 
 For local builds, first check out the public build plugin at
 `build-tools/cloudstream-gradle`, revision
@@ -43,11 +61,10 @@ gradle CinemaArmy:testDebugUnitTest CinemaArmy:make
 python3 tools/smoke_cinema.py
 ```
 
-## Privacy and source
+## Repository and source
 
-The repository and build artifacts remain private. There is no public release,
-builds branch, or repo.json feed. A private GitHub raw URL cannot be used as an
-unauthenticated Cloudstream repository feed. Never embed a GitHub token into a URL.
+This repository is public, including source code, the extension download and feed.
+Do not put credentials into repository URLs or source files.
 
 Build configuration is based on the public-domain
 [Cloudstream TestPlugins template](https://github.com/recloudstream/TestPlugins).
