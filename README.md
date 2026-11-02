@@ -2,6 +2,16 @@
 
 Cloudstream extensions for Steven3215.
 
+## UniqueStream Anime
+
+Provider for https://anime.uniquestream.net/ with catalog/search, anime movies,
+paginated seasons and episodes, Japanese/original and English audio, signed HLS
+playback and subtitles. The player uses an in-memory interceptor for the site's
+ordinary HLS key transport. Chromecast is unsupported because its receiver cannot
+run that interceptor. Streams that are processing or unavailable are not queued.
+
+Device testing is pending; this provider is marked beta-only.
+
 ## Cinema Army
 
 Initial implementation for https://cinema.army:
@@ -57,7 +67,7 @@ For local builds, first check out the public build plugin at
 Local prerequisites: Java 17, Android SDK 35 and Gradle 8.12 (no wrapper included).
 
 ```text
-gradle CinemaArmy:testDebugUnitTest CinemaArmy:make
+gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make
 python3 tools/smoke_cinema.py
 ```
 

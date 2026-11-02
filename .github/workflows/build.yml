@@ -1,4 +1,4 @@
-name: Build private extension artifact
+name: Build Cloudstream extensions
 
 on:
   workflow_dispatch:
@@ -6,10 +6,12 @@ on:
     branches: [main]
     paths:
       - 'CinemaArmy/**'
+      - 'UniqueStreamAnime/**'
       - '*.gradle.kts'
       - 'gradle.properties'
       - '.github/workflows/build.yml'
       - 'tools/smoke_cinema.py'
+      - 'tools/smoke_unique.py'
 
 permissions:
   contents: read
@@ -27,6 +29,9 @@ jobs:
       - name: Live API and public-domain playback smoke test
         continue-on-error: true
         run: python3 tools/smoke_cinema.py
+      - name: Live UniqueStream API and HLS smoke test
+        continue-on-error: true
+        run: python3 tools/smoke_unique.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -39,11 +44,11 @@ jobs:
         with:
           gradle-version: '8.12'
       - name: Unit tests and extension build
-        run: gradle CinemaArmy:testDebugUnitTest CinemaArmy:make --stacktrace
-      - name: Save private build artifact
+        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make --stacktrace
+      - name: Save compiled extensions
         uses: actions/upload-artifact@v4
         with:
-          name: CinemaArmy
+          name: CloudstreamExtensions
           path: |
             **/build/**/*.cs3
           if-no-files-found: error
