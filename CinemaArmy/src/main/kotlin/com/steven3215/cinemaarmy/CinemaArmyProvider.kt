@@ -100,10 +100,10 @@ class CinemaArmyProvider : MainAPI() {
             metadata(body, "movie")
         }
         val episodes = mutableListOf<Episode>()
-        for (season in body.get("seasons").orEmpty()) {
+        for (season in body.get("seasons")?.toList().orEmpty()) {
             val seasonNumber = season.number("season_number")?.takeIf { it > 0 } ?: continue
             val details = optionalGet("tv/${item.id}/season/$seasonNumber?language=en-US") ?: continue
-            for (episode in details.get("episodes").orEmpty()) {
+            for (episode in details.get("episodes")?.toList().orEmpty()) {
                 val episodeNumber = episode.number("episode_number")?.takeIf { it > 0 } ?: continue
                 episodes += newEpisode(CinemaItem(item.id, "tv", seasonNumber, episodeNumber).watchUrl(mainUrl)) {
                     this.season = seasonNumber
