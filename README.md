@@ -39,7 +39,7 @@ Open **Settings → Extensions → Add repository** and enter the case-sensitive
 ```
 
 Keep the leading exclamation mark. Then open **Steven's Cloudstream Providers**
-and install **Cinema Army**. The provider is currently marked beta-only; use the
+and install **Cinema Army** or **UniqueStream Anime**. The provider is currently marked beta-only; use the
 Cloudstream prerelease build if it is unavailable in the stable app.
 
 Full repository URL (fallback):
@@ -55,7 +55,7 @@ The GitHub Actions build workflow runs unit tests and packages a .cs3 artifact.
 It also runs a non-blocking live API and HLS playlist check using Night of the
 Living Dead (1968). Artifacts expire after seven days.
 
-To publish a new version, replace downloads/CinemaArmy.cs3 and update its version,
+To publish a new version, replace the matching .cs3 file under downloads/ and update its version,
 fileSize and fileHash in plugins.json together. The feed URL and shortcode remain
 unchanged. The current build workflow produces artifacts; it does not automatically
 replace the published download.
