@@ -19,6 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: recloudstream/gradle
+          ref: 7cc64f92d88350ecbf775d6332de14dcaa71dcda
+          path: build-tools/cloudstream-gradle
+      - name: Live API and public-domain playback smoke test
+        continue-on-error: true
+        run: python3 tools/smoke_cinema.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -40,6 +48,3 @@ jobs:
             **/build/**/*.cs3
           if-no-files-found: error
           retention-days: 7
-      - name: Live API and public-domain playback smoke test
-        continue-on-error: true
-        run: python3 tools/smoke_cinema.py

@@ -32,6 +32,10 @@ A separate non-blocking live smoke check tests catalog/search/details/TV episode
 and an HLS playlist for Night of the Living Dead (1968). Its outcome is visible
 in the workflow log. This does not replace on-device playback testing.
 
+For local builds, first check out the public build plugin at
+`build-tools/cloudstream-gradle`, revision
+`7cc64f92d88350ecbf775d6332de14dcaa71dcda`. GitHub Actions does this automatically.
+
 Local prerequisites: Java 17, Android SDK 35 and Gradle 8.12 (no wrapper included).
 
 ```text
@@ -47,4 +51,4 @@ unauthenticated Cloudstream repository feed. Never embed a GitHub token into a U
 
 Build configuration is based on the public-domain
 [Cloudstream TestPlugins template](https://github.com/recloudstream/TestPlugins).
-Upstream Gradle/API dependencies use moving versions.
+The Gradle plugin source revision is pinned; the Cloudstream API JAR uses the pre-release channel.

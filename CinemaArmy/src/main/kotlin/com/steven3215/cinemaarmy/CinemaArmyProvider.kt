@@ -8,6 +8,9 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.newExtractorLink
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import java.net.URLEncoder
 
 class CinemaArmyProvider : MainAPI() {
@@ -124,26 +127,31 @@ class CinemaArmyProvider : MainAPI() {
     ): Boolean {
         val item = CinemaProtocol.item(data, mainUrl)
         val path = item.streamPath()
+        val streams = coroutineScope {
+            listOf("cookiebakers", "tcloud", "ipcloud", "dcloud").mapIndexed { index, server ->
+                async {
+                    try {
+                        val requestHeaders = headers + ("X-Stream-Token" to CinemaProtocol.token(item.id))
+                        val response = if (server == "cookiebakers") {
+                            app.post("$api/$server/$path", headers = requestHeaders, timeout = 20)
+                        } else app.get("$api/$server/$path", headers = requestHeaders, timeout = 20)
+                        if (response.code !in 200..299) return@async null
+                        val value = json.readTree(response.text).get("stream")?.text("url") ?: return@async null
+                        index to CinemaProtocol.streamUrl(value)
+                    } catch (error: Exception) {
+                        if (error is CancellationException) throw error
+                        null
+                    }
+                }
+            }.awaitAll().filterNotNull()
+        }
         val seen = mutableSetOf<String>()
-        for ((index, server) in listOf("cookiebakers", "tcloud", "ipcloud", "dcloud").withIndex()) {
-            try {
-                // Tokens are short-lived; generate immediately before each server request.
-                val requestHeaders = headers + ("X-Stream-Token" to CinemaProtocol.token(item.id))
-                val response = if (server == "cookiebakers") {
-                    app.post("$api/$server/$path", headers = requestHeaders, timeout = 20)
-                } else app.get("$api/$server/$path", headers = requestHeaders, timeout = 20)
-                if (response.code !in 200..299) continue
-                val value = json.readTree(response.text).get("stream")?.text("url") ?: continue
-                val stream = CinemaProtocol.streamUrl(value)
-                if (!seen.add(stream)) continue
-                callback(newExtractorLink(name, "$name Server ${index + 1}", stream, ExtractorLinkType.M3U8) {
-                    referer = "$mainUrl/"
-                    this.headers = mapOf("Referer" to "$mainUrl/", "Origin" to mainUrl)
-                })
-            } catch (error: Exception) {
-                if (error is CancellationException) throw error
-                // Missing titles and unavailable servers must not prevent fallback.
-            }
+        for ((index, stream) in streams) {
+            if (!seen.add(stream)) continue
+            callback(newExtractorLink(name, "$name Server ${index + 1}", stream, ExtractorLinkType.M3U8) {
+                referer = "$mainUrl/"
+                this.headers = mapOf("Referer" to "$mainUrl/", "Origin" to mainUrl)
+            })
         }
         if (seen.isNotEmpty()) loadSubtitles(item, subtitleCallback)
         return seen.isNotEmpty()
