@@ -1,4 +1,4 @@
-# Cloudstream providers
+# Caramelo
 
 Cloudstream extensions for Steven3215.
 
@@ -47,7 +47,7 @@ Open **Settings → Extensions → Add repository** and enter the case-sensitive
 !WYx67
 ```
 
-Keep the leading exclamation mark. Then open **Steven's Cloudstream Providers**
+Keep the leading exclamation mark. Then open **Caramelo**
 and install **Cinema Army**, **UniqueStream Anime**, or **Sportsbite**. The provider is currently marked beta-only; use the
 Cloudstream prerelease build if it is unavailable in the stable app.
 
