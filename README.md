@@ -2,6 +2,22 @@
 
 Cloudstream extensions for Steven3215.
 
+## Movy
+
+Movies and TV shows from https://www.movy.sx/, including paginated movie/TV/genre rows,
+search (first result page), movie details, seasons, episodes, quality choices and available subtitles.
+Open the extension's settings/gear button to toggle homepage rows and select playback servers.
+Four original-audio servers are enabled by default. Additional original-audio, German, French,
+Hindi and Spanish servers are optional; not every title exists on every server.
+Disabling all servers produces an instruction to enable one. Switch sources or restart after homepage changes.
+
+Catalog and playback requests follow the website's normal public client. Source metadata uses
+a short-lived public seed and the client response decoder; no account secrets or video DRM keys are embedded.
+HLS playlists are checked before links are offered; direct MP4 links may also be offered when present.
+The automated live check uses Night of the Living Dead (1968) and reads only a bounded media prefix in memory.
+Streams may be offline, blocked by an upstream service or unavailable for a catalog entry.
+Beta-only; Android playback, casting and settings UI remain device-test pending.
+
 ## Global Free TV
 
 Live channel directory from https://www.globalfreetv.com/, including all listed categories and countries.
