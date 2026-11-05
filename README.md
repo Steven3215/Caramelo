@@ -67,7 +67,7 @@ Cloudstream prerelease build if it is unavailable in the stable app.
 
 Full repository URL (fallback):
 
-https://raw.githubusercontent.com/Steven3215/cloudstream-providers/main/repo.json
+https://raw.githubusercontent.com/Steven3215/Caramelo/main/repo.json
 
 The shortcode redirects directly to this feed. Compiled downloads are published
 under downloads/ and verified using the SHA-256 checksum in plugins.json.

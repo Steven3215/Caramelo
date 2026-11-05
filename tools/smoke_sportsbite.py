@@ -8,7 +8,9 @@ import urllib.request
 BASE = "https://sportsbite.org"
 
 def get(url, referer=BASE + "/", limit=2_000_000, headers=None):
-    req = urllib.request.Request(url, headers={"Referer": referer, "User-Agent": "Mozilla/5.0", **(headers or {})})
+    req = urllib.request.Request(url, headers={"Referer": referer,
+        "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+        "Accept": "application/json" if "/api/forestgump/" in url else "*/*", **(headers or {})})
     with urllib.request.urlopen(req, timeout=12) as response:
         return response.read(limit)
 

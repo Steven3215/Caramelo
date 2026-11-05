@@ -10,6 +10,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import okhttp3.Interceptor
@@ -32,6 +33,7 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
         else SportsbiteCatalog.tvRows(settings.categories(), settings.countries(), settings.grouping(), settings::enabled, settings::allowedCountry)
             .map { (key, label) -> mainPage(key, label) }
     private val json = ObjectMapper()
+    private val requestHeaders = mapOf("User-Agent" to "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36")
     @Volatile private var cached: List<JsonNode> = emptyList()
     @Volatile private var cachedAt = 0L
     private fun key(item: JsonNode): String? = SportsbiteCatalog.id(if (liveTv) item.text("id") else item.text("event_key") ?: item.text("slug"))
@@ -45,7 +47,7 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
         val ttl = if (liveTv) 120000 else 30000
         if (!force && cachedAt > 0 && System.currentTimeMillis() - cachedAt < ttl) return cached
         val endpoint = if (liveTv) "channels" else "matches"
-        val response = app.get("$mainUrl/api/forestgump/$endpoint", headers = mapOf("Accept" to "application/json"), timeout = 25)
+        val response = app.get("$mainUrl/api/forestgump/$endpoint", headers = requestHeaders + ("Accept" to "application/json"), timeout = 25)
         if (response.code !in 200..299) throw ErrorLoadingException("Sportsbite catalog unavailable (HTTP ${response.code})")
         val body = json.readTree(response.text)
         val result = if (liveTv) {
@@ -115,8 +117,13 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
     private suspend fun verifiedPlaylist(url: String, referer: String): String? {
         if (!SportsbiteProtocol.webUrl(url)) return null
         val target = SportsbiteProtocol.playbackUrl(url, mainUrl)
-        val response = app.get(target, referer = referer, timeout = 12)
-        return target.takeIf { response.code in 200..299 && SportsbiteProtocol.playlist(response.text) }
+        repeat(2) { attempt ->
+            val response = app.get(target, headers = requestHeaders, referer = referer, timeout = 12)
+            if (response.code in 200..299 && SportsbiteProtocol.playlist(response.text)) return target
+            if (attempt == 0 && response.code in setOf(429, 500, 502, 503, 504)) delay(1000)
+            else return null
+        }
+        return null
     }
     private suspend fun resolve(stream: JsonNode): Triple<String, String, String>? {
         val raw = (stream.text("manifest_url") ?: stream.text("iframe_url") ?: stream.text("embed_url"))
@@ -130,7 +137,7 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
             val mapped = route?.let { verifiedPlaylist(it, mainUrl + "/") }
             mapped ?: run {
                 if (!uri.path.contains("-embed/embed/") && !uri.path.startsWith("/selfhost/")) return null
-                val response = app.get(raw, referer = mainUrl + "/", timeout = 12)
+                val response = app.get(raw, headers = requestHeaders, referer = mainUrl + "/", timeout = 12)
                 if (response.code !in 200..299) return null
                 val source = SportsbiteProtocol.source(response.text, mainUrl) ?: return null
                 verifiedPlaylist(source, raw)
