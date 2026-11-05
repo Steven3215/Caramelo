@@ -24,9 +24,8 @@ All three new extensions are beta-only (status 3); device playback and settings 
 
 ## Settings for phone, tablet and Android TV
 
-Sportsbite v3 and Global Free TV v2 have grouped settings menus, searchable category/country lists,
-selection counts, 56dp option rows and 52dp bulk controls. Select shown/Clear shown only change
-the filtered results, while preserving hidden selections. Save commits a draft; Cancel discards it.
+Sportsbite v4 and Global Free TV v3 have grouped settings menus, searchable category/country lists,
+selection counts, 56dp option rows and 52dp bulk controls. Select all/Deselect all change every option in the current list, including options hidden by search. Save commits a draft; Cancel discards it.
 Grouping and sort changes also use Save/Cancel. Country-filter screens include an All countries action.
 Native focusable controls support touch and D-pad navigation; the TV version does not automatically
 focus the search keyboard. Existing preferences are retained. Refresh the source or restart Cloudstream
@@ -67,7 +66,7 @@ Offline, region-restricted, or unsupported sources can have no playable links. B
 
 ## Sportsbite
 
-Version 3 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
+Version 4 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
 Sports includes the live/upcoming schedule, all listed sports and an Other Sports row.
 Live TV includes non-sports channels, category and country browsing, search and pagination.
 Matching channel names within the same country share a card and offer alternate servers.
