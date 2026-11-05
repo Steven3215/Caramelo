@@ -65,8 +65,8 @@ internal class MovyProvider(private val settings: MovySettings) : MainAPI() {
             "top-tv" -> "/tv/top_rated"
             "new-movies" -> "/movie/now_playing"
             "airing-tv" -> "/tv/airing_today"
-            else -> mapOf("action" to 28, "comedy" to 35, "drama" to 18, "horror" to 27, "animation" to 16, "documentary" to 99)
-                [request.data]?.let { "/discover/movie?with_genres=$it&sort_by=popularity.desc&include_adult=false" }
+            else -> mapOf("action" to 28, "comedy" to 35, "drama" to 18, "horror" to 27, "animation" to 16, "documentary" to 99)[request.data]
+                ?.let { "/discover/movie?with_genres=$it&sort_by=popularity.desc&include_adult=false" }
                 ?: return newHomePageResponse(request, emptyList(), false)
         }
         val body = catalog(path + (if ('?' in path) "&" else "?") + "page=$page&language=en-US")
