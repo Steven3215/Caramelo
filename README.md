@@ -125,7 +125,7 @@ Open **Settings → Extensions → Add repository** and enter the case-sensitive
 ```
 
 Keep the leading exclamation mark. Then open **Caramelo**
-and install **Cinema Army**, **UniqueStream Anime**, or **Sportsbite**. The provider is currently marked beta-only; use the
+and install the providers you want. All extensions are currently marked beta-only; use the
 Cloudstream prerelease build if it is unavailable in the stable app.
 
 Full repository URL (fallback):
@@ -153,7 +153,7 @@ For local builds, first check out the public build plugin at
 Local prerequisites: Java 17, Android SDK 35 and Gradle 8.12 (no wrapper included).
 
 ```text
-gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make
+gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest Nekowatch:testDebugUnitTest AnimeSuge:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make Nekowatch:make AnimeSuge:make
 python3 tools/smoke_cinema.py
 python3 tools/smoke_unique.py
 python3 tools/smoke_sportsbite.py

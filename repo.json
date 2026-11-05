@@ -1,6 +1,6 @@
 {
   "name": "Caramelo",
-  "description": "Cinema Army, UniqueStream Anime, Sportsbite, Global Free TV and Movy extensions",
+  "description": "Caramelo movie, anime, sports and worldwide live TV extensions",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/Steven3215/Caramelo/main/plugins.json"

@@ -42,40 +42,40 @@
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Sportsbite.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "Sportsbite",
     "internalName": "Sportsbite",
     "authors": [
       "Caramelo"
     ],
-    "description": "Sportsbite Sports and Live TV. Homepage category/country toggles, TV country filter, sports browsing options and improved HLS playback. Local playback; device testing pending.",
+    "description": "Sports and Live TV with searchable category/country settings, bulk selection and saved filters. Touch and TV remote controls; device testing pending. Local playback.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Live"
     ],
     "language": "en",
-    "fileSize": 43542,
-    "fileHash": "sha256-8f5258caa41d88f60aeefac510e2ec4ebcf28555e48ccaba1b005245bc0d6c7a"
+    "fileSize": 56692,
+    "fileHash": "sha256-8a9eb0d7a43650b41a46b8bfb320487f075c2b0172715a4139c6948be8da0c46"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/GlobalFreeTV.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "Global Free TV",
     "internalName": "GlobalFreeTV",
     "authors": [
       "Caramelo"
     ],
-    "description": "Worldwide live TV with category/country homepage toggles, country filtering, sorting and broadcaster HLS playback. YouTube uses Cloudstream's extractor. Device testing pending.",
+    "description": "Worldwide live TV with searchable category/country settings, bulk selection, filters and sorting. Touch and TV remote controls; device testing pending.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Live"
     ],
     "language": "en",
-    "fileSize": 48745,
-    "fileHash": "sha256-fd034008b16dfa3d4c19817636edc41220f631a953d2b9051812e8a40cf0d8c0"
+    "fileSize": 61551,
+    "fileHash": "sha256-951bcee7a28b1b59295604a3e5c39d4045c032cb6f98670dc508db6249a020ce"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Movy.cs3",
@@ -96,5 +96,65 @@
     "language": "en",
     "fileSize": 38778,
     "fileHash": "sha256-2abd6c0488c2e36909f5311f7f7a8d84e8a557913057d05435d6049f3e77315d"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Corsflix.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "Corsflix",
+    "internalName": "Corsflix",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Experimental movie/TV catalog. Direct player returned HTTP 403; Android WebView fallback and playback are unverified.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "language": "en",
+    "fileSize": 32015,
+    "fileHash": "sha256-032b55df795310f3e5a709d26406c7a1a3bac1a34408569f10c651a84c679486"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Nekowatch.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "Nekowatch",
+    "internalName": "Nekowatch",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Anime with real SUB/DUB episode lists, signed HLS/file playback and subtitles. Live API/HLS checks passed; device testing pending.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Anime",
+      "AnimeMovie"
+    ],
+    "language": "en",
+    "fileSize": 23541,
+    "fileHash": "sha256-32d49f02af6aed8d188bce5a5bed10fa3665b8cab983d2393187382547fef9f9"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/AnimeSuge.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "AnimeSuge",
+    "internalName": "AnimeSuge",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Anime catalog, SUB/DUB episodes and MegaPlay HLS with subtitles. Live API/HLS checks passed; local playback, device testing pending.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Anime",
+      "AnimeMovie"
+    ],
+    "language": "en",
+    "fileSize": 29570,
+    "fileHash": "sha256-762ae427ea85c4a4bd9a4b23023286225b6954375480e37a413f3c2130eb3180"
   }
 ]
