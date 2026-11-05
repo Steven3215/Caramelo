@@ -57,5 +57,24 @@
     "language": "en",
     "fileSize": 43542,
     "fileHash": "sha256-8f5258caa41d88f60aeefac510e2ec4ebcf28555e48ccaba1b005245bc0d6c7a"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/GlobalFreeTV.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "Global Free TV",
+    "internalName": "GlobalFreeTV",
+    "authors": [
+      "Steven3215"
+    ],
+    "description": "Worldwide live TV with category/country homepage toggles, country filtering, sorting and broadcaster HLS playback. YouTube uses Cloudstream's extractor. Device testing pending.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Live"
+    ],
+    "language": "en",
+    "fileSize": 48745,
+    "fileHash": "sha256-fd034008b16dfa3d4c19817636edc41220f631a953d2b9051812e8a40cf0d8c0"
   }
 ]
