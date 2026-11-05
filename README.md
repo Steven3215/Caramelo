@@ -4,12 +4,26 @@ Cloudstream extensions for Steven3215.
 
 ## Sportsbite
 
-Live sports schedule provider for https://sportsbite.org/. Includes live/upcoming
-event browsing, search, per-event servers and supported HLS player resolution.
-Image-container media segments use the website's transport format, decoded by a
-local playback interceptor. Device testing is pending; beta-only.
-Casting is unsupported. Upcoming events, offline servers, unsupported iframe-only
-players and events removed from the current schedule may have no playable links.
+Version 2 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
+Sports includes the live/upcoming schedule, all listed sports and an Other Sports row.
+Live TV includes non-sports channels, category and country browsing, search and pagination.
+Matching channel names within the same country share a card and offer alternate servers.
+
+Open **Settings → Extensions → Caramelo → Sportsbite → settings/gear**:
+- Toggle each sports homepage row, TV category row and TV country row.
+- Group TV by categories (default), countries, or both.
+- Optionally restrict TV browsing and search to selected countries; All countries clears the filter.
+- Hide finished sports events (default on), or only show events with listed servers (default off).
+- Reset settings to restore defaults.
+
+Row toggles control homepage sections; they do not remove channels from search or the All Live Channels row.
+The separate country filter applies to all TV rows and search. A selected empty country filter shows no channels.
+Switch to another source and back, or restart Cloudstream, after changing homepage settings.
+New TV categories and countries are learned from the current catalog; reopen the source to see new rows.
+
+Playback verifies HLS responses, supports the site's first-party playlist routes and self-hosted raw mode,
+and decodes image-container segments locally. Listed servers can still fail upstream or stop after an event.
+Device testing is pending; beta-only. Casting is unsupported.
 
 ## UniqueStream Anime
 

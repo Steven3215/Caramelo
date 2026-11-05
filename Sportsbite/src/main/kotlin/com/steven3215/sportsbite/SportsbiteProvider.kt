@@ -17,120 +17,161 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.MediaType.Companion.toMediaType
 import java.io.IOException
 import java.net.URI
+import java.util.Locale
 
-class SportsbiteProvider : MainAPI() {
-    override var name = "Sportsbite"
+internal class SportsbiteProvider(private val settings: SportsbiteSettings, private val liveTv: Boolean = false) : MainAPI() {
+    override var name = if (liveTv) "Sportsbite Live TV" else "Sportsbite Sports"
     override var mainUrl = "https://sportsbite.org"
     override var lang = "en"
     override val supportedTypes = setOf(TvType.Live)
     override val hasMainPage = true
     override var sequentialMainPage = true
-    override val mainPage = mainPageOf(
-        "live" to "Live Now", "all" to "Sports Schedule", "football" to "Football",
-        "american-football" to "NFL / American Football", "basketball" to "Basketball",
-        "fighting" to "UFC / Boxing", "motorsport" to "Motorsport"
-    )
+    override val mainPage: List<MainPageData>
+        get() = if (!liveTv) SportsbiteCatalog.sports.filter { settings.enabled("sport:" + it.key) }
+            .map { (key, label) -> mainPage(key, label) }
+        else SportsbiteCatalog.tvRows(settings.categories(), settings.countries(), settings.grouping(), settings::enabled, settings::allowedCountry)
+            .map { (key, label) -> mainPage(key, label) }
     private val json = ObjectMapper()
     @Volatile private var cached: List<JsonNode> = emptyList()
     @Volatile private var cachedAt = 0L
-    private fun JsonNode.text(key: String): String? = get(key)?.takeUnless { it.isNull }?.asText()?.takeIf { it.isNotBlank() }
-    private fun JsonNode.items(key: String): List<JsonNode> = get(key)?.takeIf { it.isArray }?.toList().orEmpty()
-    private fun key(event: JsonNode): String? = (event.text("event_key") ?: event.text("slug"))
-        ?.takeIf { Regex("[A-Za-z0-9_-]{1,240}").matches(it) }
-    private fun live(event: JsonNode): Boolean = event.get("live_status")?.text("state")?.let { it == "in" }
-        ?: (event.get("is_live")?.asBoolean() ?: event.get("live")?.asBoolean() ?: false)
-    private fun url(event: JsonNode): String = "$mainUrl/event/${key(event)}"
-    private fun poster(event: JsonNode): String? = event.text("poster")?.let {
-        if (it.startsWith("/")) "$mainUrl$it" else it
-    }?.takeIf { SportsbiteProtocol.webUrl(it) }
+    private fun key(item: JsonNode): String? = SportsbiteCatalog.id(if (liveTv) item.text("id") else item.text("event_key") ?: item.text("slug"))
+    private fun itemUrl(item: JsonNode) = mainUrl + (if (liveTv) "/channel/" else "/event/") + key(item)
+    private fun country(item: JsonNode) = SportsbiteCatalog.country(item.text("country"))
+    private fun category(item: JsonNode) = item.text("category") ?: "General"
+    private fun channelGroup(item: JsonNode) = item.text("name").orEmpty().lowercase(Locale.ROOT).trim() + "|" + country(item)
+    private fun poster(item: JsonNode): String? = (item.text("poster") ?: item.text("logo_url") ?: item.text("image"))
+        ?.let { URI(mainUrl).resolve(it).toString() }?.takeIf { SportsbiteProtocol.webUrl(it) }
     private suspend fun catalog(force: Boolean = false): List<JsonNode> {
-        if (!force && cachedAt > 0 && System.currentTimeMillis() - cachedAt < 30000) return cached
-        val response = app.get("$mainUrl/api/forestgump/matches", headers = mapOf("Accept" to "application/json"), timeout = 25)
-        if (response.code !in 200..299) throw ErrorLoadingException("Sportsbite schedule unavailable (HTTP ${response.code})")
+        val ttl = if (liveTv) 120000 else 30000
+        if (!force && cachedAt > 0 && System.currentTimeMillis() - cachedAt < ttl) return cached
+        val endpoint = if (liveTv) "channels" else "matches"
+        val response = app.get("$mainUrl/api/forestgump/$endpoint", headers = mapOf("Accept" to "application/json"), timeout = 25)
+        if (response.code !in 200..299) throw ErrorLoadingException("Sportsbite catalog unavailable (HTTP ${response.code})")
         val body = json.readTree(response.text)
-        if (body.get("days")?.isArray != true) throw ErrorLoadingException("Invalid Sportsbite schedule")
-        val events = body.items("days").flatMap { it.items("events") }
-            .filter { key(it) != null && it.text("title") != null }
-            .distinctBy { key(it) }.sortedWith(compareByDescending<JsonNode> { live(it) }.thenBy { it.text("start") })
-        cached = events
+        val result = if (liveTv) {
+            val rows = if (body.isArray) body.toList() else {
+                if (body.get("channels")?.isArray != true) throw ErrorLoadingException("Invalid Sportsbite channel catalog")
+                body.items("channels")
+            }
+            rows.filter { key(it) != null && it.text("name") != null && SportsbiteCatalog.usable(it) }
+                .sortedBy { it.text("name").orEmpty().lowercase(Locale.ROOT) }
+                .also { settings.remember(it.map { c -> category(c) }, it.map { c -> country(c) }) }
+        } else {
+            if (body.get("days")?.isArray != true) throw ErrorLoadingException("Invalid Sportsbite schedule")
+            body.items("days").flatMap { it.items("events") }.filter { key(it) != null && it.text("title") != null }
+                .distinctBy { key(it) }.sortedWith(compareByDescending<JsonNode> { SportsbiteCatalog.live(it) }.thenBy { it.text("start") })
+        }
+        cached = result
         cachedAt = System.currentTimeMillis()
-        return events
+        return result
     }
-    private fun searchItem(event: JsonNode): SearchResponse = newLiveSearchResponse(
-        (if (live(event)) "[LIVE] " else "") + event.text("title").orEmpty(), url(event)) { posterUrl = poster(event) }
+    private fun browsable(rows: List<JsonNode>): List<JsonNode> = if (liveTv)
+        rows.filter { settings.allowedCountry(country(it)) }.distinctBy { channelGroup(it) }
+    else rows.filter { (!settings.flag("hide_finished", true) || !SportsbiteCatalog.finished(it)) &&
+        (!settings.flag("listed_only", false) || it.items("streams").any { stream -> SportsbiteCatalog.usable(stream) }) }
+    private fun searchItem(item: JsonNode): SearchResponse = newLiveSearchResponse(
+        if (liveTv) item.text("name").orEmpty() + " · " + country(item)
+        else (if (SportsbiteCatalog.live(item)) "[LIVE] " else "") + item.text("title").orEmpty(), itemUrl(item)) { posterUrl = poster(item) }
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        if (page > 1) return newHomePageResponse(request, emptyList(), false)
-        val rows = catalog().filter { event ->
-            val category = (event.text("category") ?: event.text("sport")).orEmpty().lowercase()
-            when (request.data) {
-                "live" -> live(event)
+        if (page < 1 || (!liveTv && page > 1)) return newHomePageResponse(request, emptyList(), false)
+        val rows = browsable(catalog()).filter { item ->
+            if (liveTv) when {
+                request.data == "tv:all" -> settings.enabled("tv:all")
+                request.data.startsWith("category:") -> settings.enabled(request.data) && category(item) == request.data.removePrefix("category:")
+                request.data.startsWith("country:") -> settings.enabled(request.data) && country(item) == request.data.removePrefix("country:")
+                else -> false
+            } else settings.enabled("sport:" + request.data) && when (request.data) {
+                "live" -> SportsbiteCatalog.live(item)
                 "all" -> true
-                "fighting" -> category in setOf("fighting", "ufc", "boxing", "mma", "wrestling")
-                "motorsport" -> category in setOf("motorsport", "motor-sports", "racing", "f1")
-                else -> category == request.data
+                else -> SportsbiteCatalog.sport(item.text("category") ?: item.text("sport")) == request.data
             }
         }
-        return newHomePageResponse(request, rows.map { searchItem(it) }, false)
+        val size = 80
+        val start = (page.toLong() - 1) * size
+        val selected = if (liveTv) rows.drop(start.coerceAtMost(rows.size.toLong()).toInt()).take(size) else rows
+        return newHomePageResponse(request, selected.map { searchItem(it) }, liveTv && start + size < rows.size)
     }
-    override suspend fun search(query: String): List<SearchResponse> =
-        catalog().filter { it.text("title").orEmpty().contains(query.trim(), true) }.map { searchItem(it) }
+    override suspend fun search(query: String): List<SearchResponse> {
+        val term = query.trim()
+        return browsable(catalog()).filter {
+            val text = if (liveTv) listOf(it.text("name"), category(it), country(it)).joinToString(" ") else it.text("title").orEmpty()
+            text.contains(term, true)
+        }.map { searchItem(it) }
+    }
     override suspend fun load(url: String): LoadResponse {
-        val eventId = SportsbiteProtocol.eventKey(url, mainUrl)
-        val event = catalog().firstOrNull { key(it) == eventId }
-            ?: throw ErrorLoadingException("This event is no longer listed")
-        return newLiveStreamLoadResponse(event.text("title").orEmpty(), url, url) {
-            posterUrl = poster(event)
-            tags = listOfNotNull(event.text("category"))
-            plot = listOfNotNull(
-                event.text("start")?.let { "Scheduled start (UTC): $it" },
-                if (live(event)) "Live now" else "Streams may only become available near kickoff.",
-                event.get("live_status")?.text("clock")?.let { "Match clock: $it" }
-            ).joinToString("\n")
+        val itemId = SportsbiteProtocol.itemKey(url, mainUrl, if (liveTv) "channel" else "event")
+        val item = catalog().firstOrNull { key(it) == itemId } ?: throw ErrorLoadingException("This item is no longer listed")
+        return newLiveStreamLoadResponse((if (liveTv) item.text("name") else item.text("title")).orEmpty(), url, url) {
+            posterUrl = poster(item)
+            tags = if (liveTv) listOf(category(item), country(item)) else listOfNotNull(item.text("category"))
+            plot = if (liveTv) "${category(item)} · ${country(item)}\nAvailable servers are checked when playback starts."
+            else listOfNotNull(item.text("start")?.let { "Scheduled start (UTC): $it" },
+                when { SportsbiteCatalog.finished(item) -> "This event has finished. Streams may be offline."
+                    SportsbiteCatalog.live(item) -> "Live now"
+                    else -> "Streams may only become available near kickoff." },
+                item.get("live_status")?.text("clock")?.let { "Match clock: $it" }).joinToString("\n")
         }
+    }
+    private suspend fun verifiedPlaylist(url: String, referer: String): String? {
+        if (!SportsbiteProtocol.webUrl(url)) return null
+        val target = SportsbiteProtocol.playbackUrl(url, mainUrl)
+        val response = app.get(target, referer = referer, timeout = 12)
+        return target.takeIf { response.code in 200..299 && SportsbiteProtocol.playlist(response.text) }
+    }
+    private suspend fun resolve(stream: JsonNode): Triple<String, String, String>? {
+        val raw = (stream.text("manifest_url") ?: stream.text("iframe_url") ?: stream.text("embed_url"))
+            ?.takeIf { SportsbiteProtocol.webUrl(it) } ?: return null
+        val uri = URI(raw)
+        val label = stream.text("name") ?: stream.text("label") ?: "Server"
+        val direct = stream.text("format")?.lowercase(Locale.ROOT) in setOf("hls", "m3u8") || uri.path.endsWith(".m3u8")
+        val target = if (direct) verifiedPlaylist(raw, mainUrl + "/") else {
+            if (uri.host != URI(mainUrl).host || uri.scheme != "https" || uri.userInfo != null) return null
+            val route = SportsbiteProtocol.playlistRoute(raw, mainUrl)
+            val mapped = route?.let { verifiedPlaylist(it, mainUrl + "/") }
+            mapped ?: run {
+                if (!uri.path.contains("-embed/embed/") && !uri.path.startsWith("/selfhost/")) return null
+                val response = app.get(raw, referer = mainUrl + "/", timeout = 12)
+                if (response.code !in 200..299) return null
+                val source = SportsbiteProtocol.source(response.text, mainUrl) ?: return null
+                verifiedPlaylist(source, raw)
+            }
+        } ?: return null
+        return Triple(label, target, raw)
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit): Boolean {
         if (isCasting) return false
-        val eventId = SportsbiteProtocol.eventKey(data, mainUrl)
-        val event = catalog(true).firstOrNull { key(it) == eventId } ?: return false
+        val itemId = SportsbiteProtocol.itemKey(data, mainUrl, if (liveTv) "channel" else "event")
+        val rows = catalog(true)
+        val item = rows.firstOrNull { key(it) == itemId } ?: throw ErrorLoadingException("This item is no longer listed")
         val gate = Semaphore(4)
-        val sources = event.items("streams").filter { it.text("status") != "offline" }
-            .distinctBy { it.text("manifest_url") }.take(16)
+        val sources = (if (liveTv) rows.filter { channelGroup(it) == channelGroup(item) } else item.items("streams"))
+            .filter { SportsbiteCatalog.usable(it) }.distinctBy { it.text("manifest_url") ?: it.text("iframe_url") ?: it.text("embed_url") }.take(32)
         val resolved = coroutineScope {
             sources.map { stream -> async {
                 gate.withPermit {
-                    try {
-                        val raw = stream.text("manifest_url")?.takeIf { SportsbiteProtocol.webUrl(it) } ?: return@withPermit null
-                        val uri = URI(raw)
-                        val direct = stream.text("format")?.lowercase() in setOf("hls", "m3u8") || uri.path.endsWith(".m3u8")
-                        val target = if (direct) raw else {
-                            if (uri.host != URI(mainUrl).host || !uri.path.contains("-embed/embed/")) return@withPermit null
-                            val response = app.get(raw, referer = "$mainUrl/", timeout = 12)
-                            if (response.code !in 200..299) return@withPermit null
-                            SportsbiteProtocol.source(response.text) ?: return@withPermit null
-                        }
-                        Triple(stream.text("name") ?: stream.text("label") ?: "Server", target, raw)
-                    } catch (error: Exception) {
+                    try { resolve(stream) } catch (error: Exception) {
                         if (error is CancellationException) throw error
                         null
                     }
                 }
-            } }.awaitAll().filterNotNull()
+            } }.awaitAll().filterNotNull().distinctBy { it.second }
         }
-        for ((label, target, embed) in resolved.distinctBy { it.second }) {
+        for ((label, target, embed) in resolved) {
             callback(newExtractorLink(name, "$name – $label", target, ExtractorLinkType.M3U8) {
                 referer = embed
                 extractorData = "sportsbite-media-v1"
             })
         }
-        return resolved.isNotEmpty()
+        if (resolved.isEmpty()) throw ErrorLoadingException("No working Sportsbite playlist is available right now. The event may not have started, may have ended, or the upstream channel may be offline.")
+        return true
     }
     override fun getVideoInterceptor(extractorLink: ExtractorLink): Interceptor? {
         if (extractorLink.extractorData != "sportsbite-media-v1") return null
         return Interceptor { chain ->
             val request = chain.request()
             val ownHost = request.url.host == URI(mainUrl).host
-            val imagePath = Regex("\\.(png|webp|jpe?g)$", RegexOption.IGNORE_CASE).containsMatchIn(request.url.encodedPath)
+            val imagePath = Regex("\\.(png|webp|jpe?g|image)$", RegexOption.IGNORE_CASE).containsMatchIn(request.url.encodedPath)
             val builder = request.newBuilder()
             if (!ownHost) builder.removeHeader("Referer").removeHeader("Origin")
             if (imagePath) builder.removeHeader("Range")

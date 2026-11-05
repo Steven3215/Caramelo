@@ -1,6 +1,6 @@
-version = 1
+version = 2
 cloudstream {
-    description = "Sportsbite live sports schedule and supported HLS servers. Device testing pending."
+    description = "Sportsbite Sports and Live TV, with configurable homepage categories, countries and filters. Local playback; device testing pending."
     authors = listOf("Steven3215")
     status = 3
     tvTypes = listOf("Live")

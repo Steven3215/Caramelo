@@ -17,23 +17,43 @@ internal object SportsbiteProtocol {
         val u = URI(value)
         u.scheme in setOf("http", "https") && !u.host.isNullOrBlank() && u.userInfo == null
     }.getOrDefault(false)
-    fun eventKey(url: String, base: String): String {
+    fun eventKey(url: String, base: String): String = itemKey(url, base, "event")
+    fun itemKey(url: String, base: String, kind: String): String {
         val u = URI(url)
         val b = URI(base)
         require(u.scheme == b.scheme && u.host == b.host && u.port == b.port && u.userInfo == null)
-        require(u.path.startsWith("/event/"))
-        val key = URLDecoder.decode(u.rawPath.removePrefix("/event/"), "UTF-8")
+        require(u.path.startsWith("/$kind/"))
+        val key = URLDecoder.decode(u.rawPath.removePrefix("/$kind/"), "UTF-8")
         require(Regex("[A-Za-z0-9_-]{1,240}").matches(key))
         return key
     }
     @OptIn(ExperimentalEncodingApi::class)
-    fun source(html: String): String? {
+    fun source(html: String, base: String = "https://sportsbite.org"): String? {
         val encoded = Regex("""(?:var|let|const)\s+source\s*=\s*(?:window\.)?atob\(\s*["']([^"']+)["']\s*\)""")
             .find(html)?.groupValues?.get(1)
         val value = if (encoded != null) runCatching { Base64.Default.decode(encoded).toString(Charsets.UTF_8) }.getOrNull()
-            else Regex("""(?:var|let|const)\s+source\s*=\s*["'](https?://[^"']+)["']""").find(html)?.groupValues?.get(1)
-        return value?.takeIf { webUrl(it) }
+            else Regex("""(?:var|let|const)\s+source\s*=\s*["']((?:https?://|/)[^"']+)["']""").find(html)?.groupValues?.get(1)
+        return value?.let { runCatching { URI(base).resolve(it).toString() }.getOrNull() }?.takeIf { webUrl(it) }
     }
+    // The site's embeds can return its SPA shell. These public first-party routes are
+    // verified as HLS before being returned; never offer an HTML response as a stream.
+    fun playlistRoute(embed: String, base: String): String? = runCatching {
+        val u = URI(embed)
+        val b = URI(base)
+        require(u.scheme == b.scheme && u.host == b.host && u.port == b.port && u.userInfo == null)
+        val route = Regex("^/(247|t247|cv|mx|tlive|lol|dk)-embed/embed/([A-Za-z0-9_-]{1,240})$").matchEntire(u.path)
+        if (route != null) "$base/${route.groupValues[1]}/${route.groupValues[2]}" +
+            if (route.groupValues[1] in setOf("mx", "tlive", "lol", "dk")) "?v=high" else ""
+        else Regex("^/selfhost/(?:embed|e)/(s-[A-Za-z0-9_-]{1,240})$").matchEntire(u.path)?.let {
+            "$base/selfhost/play/${it.groupValues[1]}?raw=1"
+        }
+    }.getOrNull()
+    fun playbackUrl(value: String, base: String): String {
+        val u = URI(value)
+        return if (u.host == URI(base).host && u.path.startsWith("/selfhost/"))
+            "$base${u.rawPath}?raw=1" else value
+    }
+    fun playlist(text: String) = text.trimStart('\uFEFF', ' ', '\n', '\r', '\t').startsWith("#EXTM3U")
     fun looksLikeTs(b: ByteArray, at: Int = 0, length: Int = b.size - at): Boolean =
         at >= 0 && length >= 188 * 3 && at.toLong() + length <= b.size &&
             b[at] == 0x47.toByte() && b[at + 188] == 0x47.toByte() && b[at + 376] == 0x47.toByte()
