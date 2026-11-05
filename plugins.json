@@ -42,40 +42,40 @@
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Sportsbite.cs3",
     "status": 3,
-    "version": 3,
+    "version": 4,
     "apiVersion": 1,
     "name": "Sportsbite",
     "internalName": "Sportsbite",
     "authors": [
       "Caramelo"
     ],
-    "description": "Sports and Live TV with searchable category/country settings, bulk selection and saved filters. Touch and TV remote controls; device testing pending. Local playback.",
+    "description": "Sports and Live TV with searchable category/country settings, Select all/Deselect all and saved filters. Touch and TV remote controls; device testing pending. Local playback.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Live"
     ],
     "language": "en",
-    "fileSize": 56692,
-    "fileHash": "sha256-8a9eb0d7a43650b41a46b8bfb320487f075c2b0172715a4139c6948be8da0c46"
+    "fileSize": 56659,
+    "fileHash": "sha256-69af2a342bc5e6b41c5243f492ab05a011594f020c250056764ae78dd693d3df"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/GlobalFreeTV.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "Global Free TV",
     "internalName": "GlobalFreeTV",
     "authors": [
       "Caramelo"
     ],
-    "description": "Worldwide live TV with searchable category/country settings, bulk selection, filters and sorting. Touch and TV remote controls; device testing pending.",
+    "description": "Worldwide live TV with searchable category/country settings, Select all/Deselect all, filters and sorting. Touch and TV remote controls; device testing pending.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Live"
     ],
     "language": "en",
-    "fileSize": 61551,
-    "fileHash": "sha256-951bcee7a28b1b59295604a3e5c39d4045c032cb6f98670dc508db6249a020ce"
+    "fileSize": 61528,
+    "fileHash": "sha256-64055668f7d6fd232d175db6c0ee6f6684bb6281884860830570c8dc2c53215a"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Movy.cs3",
