@@ -90,8 +90,10 @@ For local builds, first check out the public build plugin at
 Local prerequisites: Java 17, Android SDK 35 and Gradle 8.12 (no wrapper included).
 
 ```text
-gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make
+gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make
 python3 tools/smoke_cinema.py
+python3 tools/smoke_unique.py
+python3 tools/smoke_sportsbite.py
 ```
 
 ## Repository and source

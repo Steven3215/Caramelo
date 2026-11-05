@@ -3,6 +3,6 @@
   "description": "Cinema Army, UniqueStream Anime and Sportsbite extensions",
   "manifestVersion": 1,
   "pluginLists": [
-    "https://raw.githubusercontent.com/Steven3215/cloudstream-providers/main/plugins.json"
+    "https://raw.githubusercontent.com/Steven3215/Caramelo/main/plugins.json"
   ]
 }
