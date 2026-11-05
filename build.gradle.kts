@@ -44,7 +44,12 @@ subprojects {
         setRepo(System.getenv("GITHUB_REPOSITORY") ?: "Steven3215/Caramelo")
     }
 
+    val sharedSettings = name in setOf("Sportsbite", "GlobalFreeTV")
     android {
+        if (sharedSettings) {
+            sourceSets.getByName("main").java.srcDir(rootProject.file("shared-settings/src/main/kotlin"))
+            sourceSets.getByName("test").java.srcDir(rootProject.file("shared-settings/src/test/kotlin"))
+        }
         namespace = "com.example"
 
         defaultConfig {

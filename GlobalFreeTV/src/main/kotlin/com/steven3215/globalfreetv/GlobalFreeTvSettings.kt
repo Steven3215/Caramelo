@@ -3,6 +3,10 @@ package com.steven3215.globalfreetv
 import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
+import com.caramelo.settings.SelectionItem
+import com.caramelo.settings.SettingsAction
+import com.caramelo.settings.SettingsSection
+import com.caramelo.settings.SettingsUi
 
 internal class GlobalFreeTvSettings(context: Context) {
     private val prefs = context.applicationContext.getSharedPreferences("caramelo_globalfreetv_v1", Context.MODE_PRIVATE)
@@ -27,48 +31,50 @@ internal class GlobalFreeTvSettings(context: Context) {
     private fun saved(context: Context) {
         Toast.makeText(context, "Saved. Switch sources or restart Cloudstream to refresh homepage rows.", Toast.LENGTH_LONG).show()
     }
-    private fun rows(context: Context, title: String, values: List<Pair<String, String>>) {
-        val checked = values.map { enabled(it.first) }.toBooleanArray()
-        AlertDialog.Builder(context).setTitle(title)
-            .setMultiChoiceItems(values.map { it.second }.toTypedArray(), checked) { _, i, value -> checked[i] = value }
-            .setPositiveButton("Save") { _, _ ->
+    private fun rows(context: Context, title: String, values: List<Pair<String, String>>, refresh: () -> Unit) {
+        SettingsUi.select(context, title, "Choose the rows shown on your homepage. Row switches do not remove channels from search.",
+            values.map { SelectionItem(it.first, it.second) }, values.filter { enabled(it.first) }.map { it.first }.toSet(), { selected ->
                 val hidden = prefs.getStringSet("hidden", emptySet()).orEmpty().toMutableSet()
-                values.forEachIndexed { i, item -> if (checked[i]) hidden.remove(item.first) else hidden.add(item.first) }
-                prefs.edit().putStringSet("hidden", hidden).apply(); saved(context)
-            }.setNeutralButton("Enable all") { _, _ ->
-                prefs.edit().putStringSet("hidden", prefs.getStringSet("hidden", emptySet()).orEmpty() - values.map { it.first }.toSet()).apply(); saved(context)
-            }.setNegativeButton("Cancel", null).show()
+                values.forEach { if (it.first in selected) hidden.remove(it.first) else hidden.add(it.first) }
+                prefs.edit().putStringSet("hidden", hidden).apply(); refresh(); saved(context)
+            })
     }
-    private fun countryFilter(context: Context) {
+    private fun countryFilter(context: Context, refresh: () -> Unit) {
         val values = countries()
-        val checked = values.map { it.id in selectedCountries() }.toBooleanArray()
-        AlertDialog.Builder(context).setTitle("Countries to include")
-            .setMultiChoiceItems(values.map { it.label }.toTypedArray(), checked) { _, i, value -> checked[i] = value }
-            .setPositiveButton("Use selection") { _, _ ->
-                prefs.edit().putBoolean("filter_countries", true)
-                    .putStringSet("allowed_countries", values.filterIndexed { i, _ -> checked[i] }.map { it.id }.toSet()).apply(); saved(context)
-            }.setNeutralButton("All countries") { _, _ -> prefs.edit().putBoolean("filter_countries", false).apply(); saved(context) }
-            .setNegativeButton("Cancel", null).show()
-    }
-    private fun choice(context: Context, title: String, key: String, choices: Array<String>, current: Int) {
-        AlertDialog.Builder(context).setTitle(title).setSingleChoiceItems(choices, current) { dialog, i ->
-            prefs.edit().putInt(key, i).apply(); dialog.dismiss(); saved(context)
-        }.setNegativeButton("Cancel", null).show()
+        val selected = if (filtering()) selectedCountries() else values.map { it.id }.toSet()
+        SettingsUi.select(context, "Country filter", "Applies to all rows and search. No selection shows no channels. All countries removes the filter.",
+            values.map { SelectionItem(it.id, it.label) }, selected, { chosen ->
+                prefs.edit().putBoolean("filter_countries", true).putStringSet("allowed_countries", chosen).apply(); refresh(); saved(context)
+            }, { prefs.edit().putBoolean("filter_countries", false).apply(); refresh(); saved(context) })
     }
     fun show(context: Context) {
-        AlertDialog.Builder(context).setTitle("Global Free TV settings")
-            .setItems(arrayOf("Category homepage rows", "Country homepage rows", "Homepage grouping", "Country filter", "Channel order", "Reset settings")) { _, i ->
-                when (i) {
-                    0 -> rows(context, "Category homepage rows", listOf("all" to "All Live Channels", "new" to "Recently Added") + categories().map { "category:${it.id}" to it.label })
-                    1 -> rows(context, "Country homepage rows", countries().map { "country:${it.id}" to it.label })
-                    2 -> choice(context, "Homepage grouping", "grouping", arrayOf("Categories", "Countries", "Categories and countries"), grouping())
-                    3 -> countryFilter(context)
-                    4 -> choice(context, "Channel order", "sort", arrayOf("Most liked", "Alphabetical", "Newest first"), sort())
-                    5 -> AlertDialog.Builder(context).setTitle("Reset Global Free TV settings?")
-                        .setMessage("Restore all homepage rows, category grouping, most-liked order and all countries.")
-                        .setPositiveButton("Reset") { _, _ -> prefs.edit().clear().apply(); saved(context) }
-                        .setNegativeButton("Cancel", null).show()
-                }
-            }.setNegativeButton("Close", null).show()
+        SettingsUi.menu(context, "Global Free TV", "Customize your channel homepage. Search long lists, select the rows you want, then Save.") { refresh ->
+            val cats = listOf("all" to "All Live Channels", "new" to "Recently Added") + categories().map { "category:${it.id}" to it.label }
+            val countryRows = countries().map { "country:${it.id}" to it.label }
+            fun summary(values: List<Pair<String, String>>) = "${values.count { enabled(it.first) }} of ${values.size} homepage rows enabled"
+            listOf(
+                SettingsSection("Homepage", listOf(
+                    SettingsAction("Category rows", summary(cats)) { rows(context, "Categories", cats, refresh) },
+                    SettingsAction("Country rows", summary(countryRows)) { rows(context, "Countries", countryRows, refresh) },
+                    SettingsAction("Group rows by", arrayOf("Categories", "Countries", "Categories and countries")[grouping()]) {
+                        SettingsUi.choice(context, "Homepage grouping", arrayOf("Categories", "Countries", "Categories and countries"), grouping()) {
+                            prefs.edit().putInt("grouping", it).apply(); refresh(); saved(context)
+                        }
+                    }
+                )),
+                SettingsSection("Channel browsing", listOf(
+                    SettingsAction("Country filter", if (filtering()) "${selectedCountries().size} countries included" else "All countries included") { countryFilter(context, refresh) },
+                    SettingsAction("Channel order", arrayOf("Most liked", "Alphabetical", "Newest first")[sort()]) {
+                        SettingsUi.choice(context, "Channel order", arrayOf("Most liked", "Alphabetical", "Newest first"), sort()) {
+                            prefs.edit().putInt("sort", it).apply(); refresh(); saved(context)
+                        }
+                    }
+                )),
+                SettingsSection("Defaults", listOf(SettingsAction("Reset settings", "Restore all rows, most-liked order and all countries") {
+                    AlertDialog.Builder(context).setTitle("Reset Global Free TV settings?").setMessage("Your category, country and sort selections will return to their defaults.")
+                        .setPositiveButton("Reset") { _, _ -> prefs.edit().clear().apply(); refresh(); saved(context) }.setNegativeButton("Cancel", null).show()
+                }))
+            )
+        }
     }
 }

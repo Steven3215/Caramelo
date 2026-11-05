@@ -2,6 +2,36 @@
 
 Caramelo extensions for Cloudstream.
 
+## New sources
+
+**Nekowatch** provides anime home rows, search, AniList-based details, real SUB/DUB episode lists,
+signed HLS/file sources and available subtitles through the site's anonymous API. Home rows and
+search use the site's returned lists rather than inventing episode availability. Anime, episode and
+audio identities are checked before accepting playback metadata. Provider availability varies.
+
+**AnimeSuge** provides paginated listings, search, anime details, SUB/DUB episodes and captions.
+The current supported player is MegaPlay. Its public metadata transport is decoded using the
+normal player format, and image-wrapped MPEG-TS segments use a local interceptor.
+Casting is unsupported. Other player hosts may not resolve. No account or video DRM keys are stored.
+
+**Corsflix** provides movies/TV, search, details, seasons and episodes using its own catalog API.
+Homepage and server settings are included. The listed 2Embed → StreamWish player chain is parsed,
+with an Android WebView fallback for the site's Rive embed. Catalog/embed metadata checks pass,
+but direct player CDN requests returned HTTP403 in manual testing. Full Android playback is unverified;
+this source remains beta and may have no working streams depending on the upstream player.
+
+All three new extensions are beta-only (status 3); device playback and settings testing remain pending.
+
+## Settings for phone, tablet and Android TV
+
+Sportsbite v3 and Global Free TV v2 have grouped settings menus, searchable category/country lists,
+selection counts, 56dp option rows and 52dp bulk controls. Select shown/Clear shown only change
+the filtered results, while preserving hidden selections. Save commits a draft; Cancel discards it.
+Grouping and sort changes also use Save/Cancel. Country-filter screens include an All countries action.
+Native focusable controls support touch and D-pad navigation; the TV version does not automatically
+focus the search keyboard. Existing preferences are retained. Refresh the source or restart Cloudstream
+after changing homepage rows. Shared selection logic has unit coverage; Android visual/device QA is pending.
+
 ## Movy
 
 Movies and TV shows from https://www.movy.sx/, including paginated movie/TV/genre rows,
@@ -37,7 +67,7 @@ Offline, region-restricted, or unsupported sources can have no playable links. B
 
 ## Sportsbite
 
-Version 2 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
+Version 3 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
 Sports includes the live/upcoming schedule, all listed sports and an Other Sports row.
 Live TV includes non-sports channels, category and country browsing, search and pagination.
 Matching channel names within the same country share a card and offer alternate servers.

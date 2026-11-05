@@ -4,6 +4,10 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.widget.Toast
+import com.caramelo.settings.SelectionItem
+import com.caramelo.settings.SettingsAction
+import com.caramelo.settings.SettingsSection
+import com.caramelo.settings.SettingsUi
 
 internal class SportsbiteSettings(context: Context) {
     private val prefs: SharedPreferences = context.applicationContext.getSharedPreferences("caramelo_sportsbite_v2", Context.MODE_PRIVATE)
@@ -26,60 +30,57 @@ internal class SportsbiteSettings(context: Context) {
     private fun saved(context: Context) {
         Toast.makeText(context, "Saved. Switch to another source and back, or restart Cloudstream to refresh homepage rows.", Toast.LENGTH_LONG).show()
     }
-    private fun rows(context: Context, title: String, values: List<Pair<String, String>>) {
-        val checked = values.map { enabled(it.first) }.toBooleanArray()
-        AlertDialog.Builder(context).setTitle(title)
-            .setMultiChoiceItems(values.map { it.second }.toTypedArray(), checked) { _, index, value -> checked[index] = value }
-            .setPositiveButton("Save") { _, _ ->
+    private fun rows(context: Context, title: String, values: List<Pair<String, String>>, refresh: () -> Unit) {
+        SettingsUi.select(context, title, "Choose homepage rows. Search to find an option; bulk buttons affect only the shown results.",
+            values.map { SelectionItem(it.first, it.second) }, values.filter { enabled(it.first) }.map { it.first }.toSet(), { selected ->
                 val hidden = prefs.getStringSet("hidden_rows", emptySet()).orEmpty().toMutableSet()
-                values.forEachIndexed { index, item -> if (checked[index]) hidden.remove(item.first) else hidden.add(item.first) }
-                prefs.edit().putStringSet("hidden_rows", hidden).apply(); saved(context)
-            }.setNeutralButton("Enable all") { _, _ ->
-                val hidden = prefs.getStringSet("hidden_rows", emptySet()).orEmpty() - values.map { it.first }.toSet()
-                prefs.edit().putStringSet("hidden_rows", hidden).apply(); saved(context)
-            }.setNegativeButton("Cancel", null).show()
+                values.forEach { if (it.first in selected) hidden.remove(it.first) else hidden.add(it.first) }
+                prefs.edit().putStringSet("hidden_rows", hidden).apply(); refresh(); saved(context)
+            })
     }
-    private fun countryFilter(context: Context) {
+    private fun countryFilter(context: Context, refresh: () -> Unit) {
         val values = countries()
-        val selected = prefs.getStringSet("allowed_countries", emptySet()).orEmpty()
-        val checked = values.map { it in selected }.toBooleanArray()
-        AlertDialog.Builder(context).setTitle("Countries to include in Live TV")
-            .setMultiChoiceItems(values.toTypedArray(), checked) { _, index, value -> checked[index] = value }
-            .setPositiveButton("Use selection") { _, _ ->
-                val allowed = values.filterIndexed { index, _ -> checked[index] }.toSet()
-                // An empty selection is intentional: it hides all channels until a country is selected.
-                prefs.edit().putBoolean("filter_countries", true).putStringSet("allowed_countries", allowed).apply(); saved(context)
-            }.setNeutralButton("All countries") { _, _ ->
-                prefs.edit().putBoolean("filter_countries", false).apply(); saved(context)
-            }.setNegativeButton("Cancel", null).show()
+        val selected = if (flag("filter_countries", false)) prefs.getStringSet("allowed_countries", emptySet()).orEmpty() else values.toSet()
+        SettingsUi.select(context, "Country filter", "Applies to all Live TV rows and search. No selection shows no channels. All countries removes the filter.",
+            values.map { SelectionItem(it, it) }, selected, { chosen ->
+                prefs.edit().putBoolean("filter_countries", true).putStringSet("allowed_countries", chosen).apply(); refresh(); saved(context)
+            }, { prefs.edit().putBoolean("filter_countries", false).apply(); refresh(); saved(context) })
     }
-    private fun options(context: Context) {
-        val keys = listOf("hide_finished", "listed_only")
-        val checked = booleanArrayOf(flag("hide_finished", true), flag("listed_only", false))
-        AlertDialog.Builder(context).setTitle("Sports browsing")
-            .setMultiChoiceItems(arrayOf("Hide finished events", "Only show events with listed servers"), checked) { _, index, value -> checked[index] = value }
-            .setPositiveButton("Save") { _, _ ->
-                val edit = prefs.edit(); keys.forEachIndexed { i, key -> edit.putBoolean(key, checked[i]) }; edit.apply(); saved(context)
-            }.setNegativeButton("Cancel", null).show()
+    private fun options(context: Context, refresh: () -> Unit) {
+        val values = listOf(SelectionItem("hide_finished", "Hide finished events"), SelectionItem("listed_only", "Only show events with listed servers"))
+        val selected = values.filter { flag(it.id, it.id == "hide_finished") }.map { it.id }.toSet()
+        SettingsUi.select(context, "Sports browsing", "Listed servers are not a guarantee of playback. Upcoming streams may start near kickoff.", values, selected, { chosen ->
+            val edit = prefs.edit(); values.forEach { edit.putBoolean(it.id, it.id in chosen) }; edit.apply(); refresh(); saved(context)
+        })
     }
     fun show(context: Context) {
-        AlertDialog.Builder(context).setTitle("Sportsbite settings")
-            .setItems(arrayOf("Sports homepage rows", "TV category rows", "TV country rows", "TV homepage grouping", "TV country filter", "Sports browsing", "Reset settings")) { _, index ->
-                when (index) {
-                    0 -> rows(context, "Sports homepage rows", SportsbiteCatalog.sports.map { "sport:${it.key}" to it.value })
-                    1 -> rows(context, "TV category rows", listOf("tv:all" to "All Live Channels") + categories().map { "category:$it" to it })
-                    2 -> rows(context, "TV country rows", countries().map { "country:$it" to it })
-                    3 -> AlertDialog.Builder(context).setTitle("TV homepage grouping")
-                        .setSingleChoiceItems(arrayOf("Categories", "Countries", "Categories and countries"), grouping()) { dialog, choice ->
-                            prefs.edit().putInt("tv_grouping", choice).apply(); dialog.dismiss(); saved(context)
-                        }.setNegativeButton("Cancel", null).show()
-                    4 -> countryFilter(context)
-                    5 -> options(context)
-                    6 -> AlertDialog.Builder(context).setTitle("Reset Sportsbite settings?")
-                        .setMessage("Restore all homepage rows, category grouping and all countries.")
-                        .setPositiveButton("Reset") { _, _ -> prefs.edit().clear().apply(); saved(context) }
-                        .setNegativeButton("Cancel", null).show()
-                }
-            }.setNegativeButton("Close", null).show()
+        SettingsUi.menu(context, "Sportsbite", "Customize Sports and Live TV. Save applies your changes; Cancel leaves them as they were.") { refresh ->
+            val sports = SportsbiteCatalog.sports.map { "sport:${it.key}" to it.value }
+            val cats = listOf("tv:all" to "All Live Channels") + categories().map { "category:$it" to it }
+            val countries = countries().map { "country:$it" to it }
+            fun summary(values: List<Pair<String, String>>) = "${values.count { enabled(it.first) }} of ${values.size} homepage rows enabled"
+            listOf(
+                SettingsSection("Sports", listOf(
+                    SettingsAction("Homepage categories", summary(sports)) { rows(context, "Sports categories", sports, refresh) },
+                    SettingsAction("Browsing options", "Finished events and listed-server filters") { options(context, refresh) }
+                )),
+                SettingsSection("Live TV", listOf(
+                    SettingsAction("Category rows", summary(cats)) { rows(context, "TV categories", cats, refresh) },
+                    SettingsAction("Country rows", summary(countries)) { rows(context, "TV countries", countries, refresh) },
+                    SettingsAction("Homepage grouping", arrayOf("Categories", "Countries", "Categories and countries")[grouping()]) {
+                        SettingsUi.choice(context, "Homepage grouping", arrayOf("Categories", "Countries", "Categories and countries"), grouping()) {
+                            prefs.edit().putInt("tv_grouping", it).apply(); refresh(); saved(context)
+                        }
+                    },
+                    SettingsAction("Country filter", if (flag("filter_countries", false)) "${prefs.getStringSet("allowed_countries", emptySet()).orEmpty().size} countries included" else "All countries included") {
+                        countryFilter(context, refresh)
+                    }
+                )),
+                SettingsSection("Defaults", listOf(SettingsAction("Reset settings", "Restore all rows, category grouping and all countries") {
+                    AlertDialog.Builder(context).setTitle("Reset Sportsbite settings?").setMessage("Your category, country and browsing selections will return to their defaults.")
+                        .setPositiveButton("Reset") { _, _ -> prefs.edit().clear().apply(); refresh(); saved(context) }.setNegativeButton("Cancel", null).show()
+                }))
+            )
+        }
     }
 }
