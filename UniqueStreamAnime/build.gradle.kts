@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = "AnimeStream by UniqueStream: anime series and movies, audio choices and subtitles. Device testing pending."
-    authors = listOf("Steven3215")
+    authors = listOf("Caramelo")
     status = 3
     tvTypes = listOf("Anime", "AnimeMovie")
     language = "en"

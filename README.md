@@ -1,6 +1,6 @@
 # Caramelo
 
-Cloudstream extensions for Steven3215.
+Caramelo extensions for Cloudstream.
 
 ## Movy
 
@@ -137,3 +137,9 @@ Do not put credentials into repository URLs or source files.
 Build configuration is based on the public-domain
 [Cloudstream TestPlugins template](https://github.com/recloudstream/TestPlugins).
 The Gradle plugin source revision is pinned; the Cloudstream API JAR uses the pre-release channel.
+
+## Repository display name
+
+The current feed and shortcode use **Caramelo**. If Cloudstream still displays an older
+repository name, remove that repository entry and add the current feed again with the name Caramelo.
+Refresh/reinstall extensions if the cached author label still shows the old branding.

@@ -7,7 +7,7 @@
     "name": "Cinema Army",
     "internalName": "CinemaArmy",
     "authors": [
-      "Steven3215"
+      "Caramelo"
     ],
     "description": "Cinema Army movies and TV shows. Device testing pending.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
@@ -27,7 +27,7 @@
     "name": "UniqueStream Anime",
     "internalName": "UniqueStreamAnime",
     "authors": [
-      "Steven3215"
+      "Caramelo"
     ],
     "description": "AnimeStream by UniqueStream: anime series and movies, audio choices and subtitles. Device testing pending. Local playback only.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
@@ -47,7 +47,7 @@
     "name": "Sportsbite",
     "internalName": "Sportsbite",
     "authors": [
-      "Steven3215"
+      "Caramelo"
     ],
     "description": "Sportsbite Sports and Live TV. Homepage category/country toggles, TV country filter, sports browsing options and improved HLS playback. Local playback; device testing pending.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
@@ -66,7 +66,7 @@
     "name": "Global Free TV",
     "internalName": "GlobalFreeTV",
     "authors": [
-      "Steven3215"
+      "Caramelo"
     ],
     "description": "Worldwide live TV with category/country homepage toggles, country filtering, sorting and broadcaster HLS playback. YouTube uses Cloudstream's extractor. Device testing pending.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
@@ -85,7 +85,7 @@
     "name": "Movy",
     "internalName": "Movy",
     "authors": [
-      "Steven3215"
+      "Caramelo"
     ],
     "description": "Movy movies and TV shows, configurable homepage rows and playback servers. Stream availability depends on network/upstream access. Device testing pending.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",

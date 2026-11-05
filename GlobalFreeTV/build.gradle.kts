@@ -1,7 +1,7 @@
 version = 1
 cloudstream {
     description = "Global Free TV live channels with category/country homepage controls, country filtering and sorting. Device testing pending."
-    authors = listOf("Steven3215")
+    authors = listOf("Caramelo")
     status = 3
     tvTypes = listOf("Live")
     language = "en"

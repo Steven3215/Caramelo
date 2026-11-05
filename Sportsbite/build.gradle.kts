@@ -1,7 +1,7 @@
 version = 2
 cloudstream {
     description = "Sportsbite Sports and Live TV, with configurable homepage categories, countries and filters. Local playback; device testing pending."
-    authors = listOf("Steven3215")
+    authors = listOf("Caramelo")
     status = 3
     tvTypes = listOf("Live")
     language = "en"
