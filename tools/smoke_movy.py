@@ -90,7 +90,7 @@ def main():
                 print("PASS public seed, source metadata decoding, HLS and bounded media prefix (" + server + ")")
                 return
         except Exception as e:
-            failures.append(type(e).__name__)
+            failures.append(type(e).__name__ + (" HTTP " + str(e.code) if hasattr(e, "code") else ""))
     raise RuntimeError("No verified current source: " + ", ".join(failures))
 if __name__ == "__main__":
     main()

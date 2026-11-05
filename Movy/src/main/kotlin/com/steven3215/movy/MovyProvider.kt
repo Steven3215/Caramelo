@@ -86,7 +86,7 @@ internal class MovyProvider(private val settings: MovySettings) : MainAPI() {
         if (item.type == "movie") return newMovieLoadResponse(title(data), canonical, TvType.Movie, canonical) {
             posterUrl = image(data.text("poster_path")); backgroundPosterUrl = image(data.text("backdrop_path"))
             year = year(data); plot = data.text("overview"); tags = genres; duration = data.get("runtime")?.asInt()
-            addScore(data.get("vote_average")?.asDouble())
+            addScore(data.text("vote_average"))
         }
         val seasons = data.items("seasons").filter { (it.get("episode_count")?.asInt() ?: 0) > 0 }.mapNotNull { it.get("season_number")?.asInt() }.distinct().sorted()
         val episodes = coroutineScope {
@@ -103,7 +103,7 @@ internal class MovyProvider(private val settings: MovySettings) : MainAPI() {
         return newTvSeriesLoadResponse(title(data), canonical, TvType.TvSeries, episodes) {
             posterUrl = image(data.text("poster_path")); backgroundPosterUrl = image(data.text("backdrop_path"))
             year = year(data); plot = data.text("overview"); tags = genres
-            addScore(data.get("vote_average")?.asDouble())
+            addScore(data.text("vote_average"))
         }
     }
     private suspend fun seed(id: Int): String {
