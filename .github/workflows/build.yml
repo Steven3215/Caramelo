@@ -8,12 +8,14 @@ on:
       - 'CinemaArmy/**'
       - 'UniqueStreamAnime/**'
       - 'Sportsbite/**'
+      - 'GlobalFreeTV/**'
       - '*.gradle.kts'
       - 'gradle.properties'
       - '.github/workflows/build.yml'
       - 'tools/smoke_cinema.py'
       - 'tools/smoke_unique.py'
       - 'tools/smoke_sportsbite.py'
+      - 'tools/smoke_globalfreetv.py'
 
 permissions:
   contents: read
@@ -37,6 +39,9 @@ jobs:
       - name: Live Sportsbite catalog and player smoke test
         continue-on-error: true
         run: python3 tools/smoke_sportsbite.py
+      - name: Live Global Free TV catalog and HLS smoke test
+        continue-on-error: true
+        run: python3 tools/smoke_globalfreetv.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -49,7 +54,7 @@ jobs:
         with:
           gradle-version: '8.12'
       - name: Unit tests and extension build
-        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make --stacktrace
+        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make --stacktrace
       - name: Save compiled extensions
         uses: actions/upload-artifact@v4
         with:

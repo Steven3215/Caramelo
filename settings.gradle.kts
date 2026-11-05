@@ -3,4 +3,4 @@ pluginManagement {
 }
 
 rootProject.name = "CloudstreamProviders"
-include("CinemaArmy", "UniqueStreamAnime", "Sportsbite")
+include("CinemaArmy", "UniqueStreamAnime", "Sportsbite", "GlobalFreeTV")

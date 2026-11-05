@@ -2,6 +2,21 @@
 
 Cloudstream extensions for Steven3215.
 
+## Global Free TV
+
+Live channel directory from https://www.globalfreetv.com/, including all listed categories and countries.
+Open the extension's settings/gear button to toggle homepage rows, group by categories/countries/both,
+filter browsing and search by country, and choose most-liked/alphabetical/newest order.
+Recently Added always uses newest order. Row toggles affect homepage sections; the separate country
+filter applies to all rows and search. An enabled empty country selection shows no channels.
+Switch sources or restart Cloudstream after changing homepage rows. New directory entries are learned while browsing.
+
+The API pages at most 100 channels. Country filtering uses complete cached lists before local pagination,
+so sparse matches are not lost. Large filtered lists may take longer to load initially; cache lasts ten minutes.
+UK/GB and PL/pl directory aliases are combined. HLS responses are verified; supplied broadcaster Referer
+and User-Agent metadata are respected. YouTube links use Cloudstream's maintained extractor and depend on its availability.
+Offline, region-restricted, or unsupported sources can have no playable links. Beta-only; device testing pending.
+
 ## Sportsbite
 
 Version 2 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
