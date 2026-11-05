@@ -17,6 +17,8 @@ HLS playlists are checked before links are offered; direct MP4 links may also be
 The automated live check uses Night of the Living Dead (1968) and reads only a bounded media prefix in memory.
 Streams may be offline, blocked by an upstream service or unavailable for a catalog entry.
 Beta-only; Android playback, casting and settings UI remain device-test pending.
+Build and unit tests passed. Local movie playback and a TV episode playlist were verified;
+the GitHub-hosted runner's stream requests received HTTP 403, so stream availability can depend on the network.
 
 ## Global Free TV
 
