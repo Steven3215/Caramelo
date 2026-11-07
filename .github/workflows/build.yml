@@ -20,6 +20,8 @@ on:
       - 'Lightflix/**'
       - 'Nexa/**'
       - 'Moonflix/**'
+      - 'SoloLatino/**'
+      - 'tools/smoke_sololatino.py'
       - 'shared-movies/**'
       - 'tools/smoke_movie_catalogs.py'
       - 'tools/smoke_teletv.py'
@@ -83,6 +85,9 @@ jobs:
       - name: Live Lightflix, Nexa and Moonflix catalog checks
         continue-on-error: true
         run: python3 tools/smoke_movie_catalogs.py
+      - name: Live SoloLatino catalog and anonymous embed check
+        continue-on-error: true
+        run: python3 tools/smoke_sololatino.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -95,7 +100,7 @@ jobs:
         with:
           gradle-version: '8.12'
       - name: Unit tests and extension build
-        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest Nekowatch:testDebugUnitTest AnimeSuge:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make Nekowatch:make AnimeSuge:make Teleonline:testDebugUnitTest TeleLibre:testDebugUnitTest Teleonline:make TeleLibre:make JustAnime:make ThugTV:make Lightflix:make Nexa:make Moonflix:make --stacktrace
+        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest Nekowatch:testDebugUnitTest AnimeSuge:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make Nekowatch:make AnimeSuge:make Teleonline:testDebugUnitTest TeleLibre:testDebugUnitTest Teleonline:make TeleLibre:make JustAnime:make ThugTV:make Lightflix:make Nexa:make Moonflix:make SoloLatino:make --stacktrace
       - name: Save compiled extensions
         uses: actions/upload-artifact@v4
         with:
