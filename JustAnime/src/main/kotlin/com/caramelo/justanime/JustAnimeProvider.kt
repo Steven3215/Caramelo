@@ -7,6 +7,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import java.net.URI
 import java.net.URLEncoder
+import java.util.Locale
 import java.util.concurrent.CancellationException
 
 class JustAnimeProvider : MainAPI() {
@@ -108,10 +109,14 @@ class JustAnimeProvider : MainAPI() {
                         val url = source.string("url")?.takeIf { web(it) && it !in emitted } ?: continue
                         val hls = source.path("isM3U8").asBoolean() || URI(url).path.endsWith(".m3u8", true)
                         if (!hls) continue
-                        val headers = (group.path("headers").fields().asSequence() + source.path("headers").fields().asSequence())
-                            .filter { it.key.lowercase() in setOf("referer", "origin", "user-agent") && it.value.isTextual }
-                            .associate { it.key to it.value.asText() }
-                        val referer = headers.entries.firstOrNull { it.key.equals("referer", true) }?.value ?: "$mainUrl/"
+                        val suppliedHeaders = (group.path("headers").fields().asSequence() + source.path("headers").fields().asSequence())
+                            .filter { it.key.lowercase(Locale.ROOT) in setOf("referer", "origin", "user-agent") && it.value.isTextual }
+                            .associate { it.key.lowercase(Locale.ROOT) to it.value.asText() }
+                        val referer = suppliedHeaders["referer"] ?: "$mainUrl/"
+                        val headers = mapOf(
+                            "Origin" to (suppliedHeaders["origin"] ?: mainUrl),
+                            "User-Agent" to (suppliedHeaders["user-agent"] ?: "Mozilla/5.0")
+                        )
                         val response = app.get(url, headers = headers, referer = referer, timeout = 12)
                         if (response.code !in 200..299 || !response.text.trimStart().startsWith("#EXTM3U")) continue
                         emitted.add(url)
