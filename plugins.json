@@ -236,9 +236,9 @@
     "fileHash": "sha256-0836ed75c22101db00573cb8e5a773e9aa750becc1f4ee868837294b3dd08681"
   },
   {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/Lightflix.cs3",
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/a558912a2187dfe5370a292eab1f7709cf157c27/downloads/Lightflix.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "Lightflix",
     "internalName": "Lightflix",
@@ -252,8 +252,8 @@
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 40693,
-    "fileHash": "sha256-827dbadd4f2dfed2e563189b0e93dbc57f61098ff04503571ba33500ca8628cc"
+    "fileSize": 48176,
+    "fileHash": "sha256-feac2b15b8edccd5485058e95ca8cd64871301ebd1c0f3dfc327a51abe5581f7"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/Moonflix.cs3",
