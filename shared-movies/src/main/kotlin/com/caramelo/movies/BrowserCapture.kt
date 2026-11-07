@@ -6,7 +6,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.lagradost.api.getContext
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,9 +14,10 @@ import okhttp3.Request
 
 // Player frameworks can abort initialization if their stylesheet preloads fail.
 @SuppressLint("SetJavaScriptEnabled")
-internal suspend fun captureMediaWithPageResources(page: String, referer: String, match: Regex): Request? =
+internal suspend fun captureMediaWithPageResources(
+    context: Context, page: String, referer: String, match: Regex
+): Request? =
     withContext(Dispatchers.Main.immediate) {
-        val context = getContext() as? Context ?: return@withContext null
         val view = WebView(context)
         val result = CompletableDeferred<Request>()
         try {

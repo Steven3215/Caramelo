@@ -1,5 +1,7 @@
 package com.caramelo.movies
 
+import android.content.Context
+
 import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -20,7 +22,7 @@ internal data class MovieId(val type: String, val id: Int, val season: Int? = nu
     fun playbackData() = if (episode == null) "$type/$id" else "$type/$id/$season/$episode"
 }
 
-internal abstract class BrowserMovieProvider : MainAPI() {
+internal abstract class BrowserMovieProvider(private val browserContext: Context? = null) : MainAPI() {
     override var lang = "en"
     override val hasMainPage = true
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
@@ -124,7 +126,10 @@ internal abstract class BrowserMovieProvider : MainAPI() {
         val page = player(item) ?: return false
         try {
             val media = browserMedia(
-                page, "$mainUrl/", extensionlessHlsPath = extensionlessHlsPath, capture = ::captureMediaWithPageResources
+                page, "$mainUrl/", extensionlessHlsPath = extensionlessHlsPath,
+                capture = if (browserContext == null) null else { address, referer, match ->
+                    captureMediaWithPageResources(browserContext, address, referer, match)
+                }
             )
             if (media != null) {
                 mediaTracks.publish(newExtractorLink(name, "$name – Browser player", media.url, media.type) {
