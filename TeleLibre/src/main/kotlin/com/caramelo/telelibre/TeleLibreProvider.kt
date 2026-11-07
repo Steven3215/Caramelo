@@ -1,6 +1,7 @@
 package com.caramelo.telelibre
 
 import com.caramelo.tracks.MediaTracks
+import com.caramelo.tracks.checkHlsSignal
 import com.caramelo.settings.ChannelRows
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
@@ -87,14 +88,20 @@ class TeleLibreProvider internal constructor(private val settings: ChannelRows) 
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
         val mediaTracks = MediaTracks(subtitleCallback)
         val slug = slug(data) ?: return false
-        if (directory().none { it.slug == slug }) return false
+        val officialSignals = if (slug == "canal-24-horas") listOf(
+            "https://ztnr.rtve.es/ztnr/1694255.m3u8",
+            "https://rtvelivestream.rtve.es/rtvesec/24h/24h_main_dvr.m3u8"
+        ) else emptyList()
+        if (officialSignals.isEmpty() && directory().none { it.slug == slug }) return false
         val emitted = mutableSetOf<String>()
-        suspend fun emit(url: String, referer: String) {
+        suspend fun emit(url: String, referer: String, label: String? = null) {
             if (!media(url) || url in emitted) return
-            val response = app.get(url, referer = referer, timeout = 12)
-            if (response.code !in 200..299 || !response.text.trimStart().startsWith("#EXTM3U")) return
+            val playlist = checkHlsSignal(url, referer) ?: return
             emitted.add(url)
-            mediaTracks.publish(newExtractorLink(name, "$name – Signal " + emitted.size, url, ExtractorLinkType.M3U8) { this.referer = referer }, callback, response.text, response.url)
+            val stream = newExtractorLink(name, label ?: "$name – Signal ${emitted.size}", url, ExtractorLinkType.M3U8) {
+                this.referer = referer
+            }
+            mediaTracks.publish(stream, callback, playlist.manifest, playlist.url)
         }
         for (base in mirrors) {
             val channelUrl = channelUrl(slug, base)
@@ -107,7 +114,8 @@ class TeleLibreProvider internal constructor(private val settings: ChannelRows) 
             for (frame in frames) try {
                 if (media(frame)) { emit(frame, channelUrl); continue }
                 val frameUri = URI(frame)
-                if (frameUri.scheme != "https" || frameUri.host != URI(base).host ||
+                if (frameUri.scheme != "https" || frameUri.userInfo != null || frameUri.port != -1 ||
+                    mirrors.none { URI(it).host == frameUri.host } ||
                     !frameUri.path.startsWith("/en-vivo/$slug/")) continue
                 val embed = page(frame, channelUrl) ?: continue
                 for (node in embed.select("video[src], video source[src], iframe[src]")) {
@@ -125,8 +133,12 @@ class TeleLibreProvider internal constructor(private val settings: ChannelRows) 
                 val direct = Regex("""(?:file|source|src)\s*[:=]\s*["'](https://[^"'\s]+\.m3u8(?:\?[^"'\s]*)?)["']""")
                 for (match in direct.findAll(scripts).take(4)) emit(match.groupValues[1], frame)
             } catch (error: Exception) { if (error is CancellationException) throw error }
-            if (emitted.isNotEmpty()) return true
+            if (emitted.isNotEmpty()) break
         }
+        officialSignals.forEachIndexed { index, link ->
+            emit(link, "", "RTVE – Canal 24 Horas ${index + 1}")
+        }
+        if (emitted.isNotEmpty()) return true
         throw ErrorLoadingException("No supported Tele Libre stream was found. Some channels use encrypted DASH or region-specific players.")
     }
 }

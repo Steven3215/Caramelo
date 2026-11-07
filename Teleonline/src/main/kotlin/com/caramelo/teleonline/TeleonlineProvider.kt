@@ -1,6 +1,7 @@
 package com.caramelo.teleonline
 
 import com.caramelo.tracks.MediaTracks
+import com.caramelo.tracks.checkHlsSignal
 import com.caramelo.settings.ChannelRows
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -81,16 +82,20 @@ class TeleonlineProvider internal constructor(private val settings: ChannelRows)
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
         val mediaTracks = MediaTracks(subtitleCallback)
         val url = TeleonlineProtocol.channel(data)
-        val html = app.get(url, timeout = 25).text
+        val page = app.get(url, timeout = 15)
+        if (page.code !in 200..299) throw ErrorLoadingException("Teleonline channel unavailable (HTTP ${page.code})")
+        val html = page.text
+        if (TeleonlineProtocol.offline(html)) throw ErrorLoadingException("Teleonline reports that this channel is off air")
         val noReferrer = Regex("NEEDS_NOREFERRER\\s*=\\s*true").containsMatchIn(html)
+        val referer = if (noReferrer) "" else url
         var count = 0
-        for (link in TeleonlineProtocol.hls(html)) try {
-            val referer = if (noReferrer) "" else url
-            val response = app.get(link, referer = referer, timeout = 15)
-            if (response.code in 200..299 && response.text.trimStart().startsWith("#EXTM3U")) {
-                mediaTracks.publish(newExtractorLink(name, "$name – Signal ${++count}", link, ExtractorLinkType.M3U8) { this.referer = referer }, callback, response.text, response.url)
+        for (link in TeleonlineProtocol.hls(html)) {
+            val playlist = checkHlsSignal(link, referer) ?: continue
+            val stream = newExtractorLink(name, "$name – Signal ${++count}", link, ExtractorLinkType.M3U8) {
+                this.referer = referer
             }
-        } catch (error: Exception) { if (error is java.util.concurrent.CancellationException) throw error }
+            mediaTracks.publish(stream, callback, playlist.manifest, playlist.url)
+        }
         if (count == 0) throw ErrorLoadingException("No supported Teleonline HLS signal is available for this channel. Signals can be offline or region restricted.")
         return true
     }

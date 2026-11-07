@@ -1,6 +1,7 @@
 package com.caramelo.justanime
 
 import com.caramelo.tracks.MediaTracks
+import com.caramelo.tracks.checkHlsSignal
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -93,18 +94,23 @@ class JustAnimeProvider : MainAPI() {
         val path = "/watch/$id/episode/$ep"
         val servers = api("$path/servers").path("servers")
         val audioTypes = listOf("sub", "dub")
-        val serverOrder = listOf("revo", "gigi", "calm", "momo", "onyx", "nami", "zone", "susi")
-        val advertised = audioTypes.filter { audio -> serverOrder.any { servers.path(it).path(audio).asBoolean() } }
-        val verifiedAudio = mutableSetOf<String>()
+        val serverOrder = listOf("revo", "momo", "calm", "gigi", "onyx", "nami", "zone", "susi")
+        val target = audioTypes.associateWith { audio ->
+            serverOrder.count { servers.path(it).path(audio).asBoolean() }.coerceAtMost(2)
+        }
+        val verifiedServers = mutableMapOf<String, Int>()
         val emitted = mutableSetOf<String>()
         for (server in serverOrder) {
             val availability = servers.path(server)
-            val available = audioTypes.filter { availability.path(it).asBoolean() }
-            if (available.isEmpty() || (emitted.size >= 2 && available.all { it in verifiedAudio })) continue
+            val available = audioTypes.filter {
+                availability.path(it).asBoolean() && verifiedServers.getOrDefault(it, 0) < target.getValue(it)
+            }
+            if (available.isEmpty()) continue
             try {
                 val bundle = api("$path/$server")
                 for (audio in available) {
                     val group = bundle.path(audio)
+                    var foundOnServer = false
                     for (source in group.path("sources")) {
                         val url = source.string("url")?.takeIf { web(it) && it !in emitted } ?: continue
                         val hls = source.path("isM3U8").asBoolean() || URI(url).path.endsWith(".m3u8", true)
@@ -117,20 +123,20 @@ class JustAnimeProvider : MainAPI() {
                             "Origin" to (suppliedHeaders["origin"] ?: mainUrl),
                             "User-Agent" to (suppliedHeaders["user-agent"] ?: "Mozilla/5.0")
                         )
-                        val response = app.get(url, headers = headers, referer = referer, timeout = 12)
-                        if (response.code !in 200..299 || !response.text.trimStart().startsWith("#EXTM3U")) continue
+                        val playlist = checkHlsSignal(url, referer, headers) ?: continue
                         emitted.add(url)
-                        verifiedAudio.add(audio)
-                        mediaTracks.publish(newExtractorLink(name, "$name – $server", url, ExtractorLinkType.M3U8) {
+                        foundOnServer = true
+                        val audioLabel = if (audio == "dub") "DUB" else "SUB"
+                        mediaTracks.publish(newExtractorLink(name, "$name – $server · $audioLabel", url, ExtractorLinkType.M3U8) {
                             this.referer = referer
                             this.headers = headers
                             quality = getQualityFromName(source.string("quality"))
-                        }, callback, response.text, response.url, audio = if (audio == "dub") "Dubbed" else "Original")
+                        }, callback, playlist.manifest, playlist.url)
                     }
+                    if (foundOnServer) verifiedServers[audio] = verifiedServers.getOrDefault(audio, 0) + 1
                     mediaTracks.sidecars(group.path("subtitles").toList() + group.path("tracks").toList(), apiBase + "/",
                         mapOf("Origin" to mainUrl, "Referer" to "$mainUrl/"))
                 }
-                if (emitted.size >= 2 && advertised.all { it in verifiedAudio }) break
             } catch (error: Exception) { if (error is CancellationException) throw error }
         }
         if (emitted.isEmpty()) throw ErrorLoadingException("No working JustAnime HLS stream was found for this episode")
