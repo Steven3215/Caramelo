@@ -1,5 +1,6 @@
 package com.steven3215.sportsbite
 
+import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -114,18 +115,19 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
                 item.get("live_status")?.text("clock")?.let { "Match clock: $it" }).joinToString("\n")
         }
     }
-    private suspend fun verifiedPlaylist(url: String, referer: String): String? {
+    private suspend fun verifiedPlaylist(label: String, url: String, referer: String): VerifiedFeed? {
         if (!SportsbiteProtocol.webUrl(url)) return null
         val target = SportsbiteProtocol.playbackUrl(url, mainUrl)
         repeat(2) { attempt ->
             val response = app.get(target, headers = requestHeaders, referer = referer, timeout = 12)
-            if (response.code in 200..299 && SportsbiteProtocol.playlist(response.text)) return target
+            if (response.code in 200..299 && SportsbiteProtocol.playlist(response.text)) return VerifiedFeed(label, target, referer, response.text, response.url)
             if (attempt == 0 && response.code in setOf(429, 500, 502, 503, 504)) delay(1000)
             else return null
         }
         return null
     }
-    private data class VerifiedFeed(val label: String, val url: String, val referer: String)
+    private data class VerifiedFeed(val label: String, val url: String, val referer: String,
+                                    val manifest: String, val manifestUrl: String)
 
     private suspend fun resolve(stream: JsonNode): VerifiedFeed? {
         val raw = (stream.text("manifest_url") ?: stream.text("iframe_url") ?: stream.text("embed_url"))
@@ -134,20 +136,21 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
         val label = stream.text("name") ?: stream.text("label") ?: "Server"
         val direct = stream.text("format")?.lowercase(Locale.ROOT) in setOf("hls", "m3u8") || uri.path.endsWith(".m3u8")
         val siteReferer = "$mainUrl/"
-        if (direct) return verifiedPlaylist(raw, siteReferer)?.let { VerifiedFeed(label, it, siteReferer) }
+        if (direct) return verifiedPlaylist(label, raw, siteReferer)
         if (uri.host != URI(mainUrl).host || uri.scheme != "https" || uri.userInfo != null) return null
         val route = SportsbiteProtocol.playlistRoute(raw, mainUrl)
         if (route != null) {
-            verifiedPlaylist(route, siteReferer)?.let { return VerifiedFeed(label, it, siteReferer) }
+            verifiedPlaylist(label, route, siteReferer)?.let { return it }
         }
         if (!uri.path.contains("-embed/embed/") && !uri.path.startsWith("/selfhost/")) return null
         val response = app.get(raw, headers = requestHeaders, referer = siteReferer, timeout = 12)
         if (response.code !in 200..299) return null
         val source = SportsbiteProtocol.source(response.text, mainUrl) ?: return null
-        return verifiedPlaylist(source, raw)?.let { VerifiedFeed(label, it, raw) }
+        return verifiedPlaylist(label, source, raw)
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         if (isCasting) return false
         val itemId = SportsbiteProtocol.itemKey(data, mainUrl, if (liveTv) "channel" else "event")
         val rows = catalog(true)
@@ -166,11 +169,11 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
             } }.awaitAll().filterNotNull().distinctBy { it.url }
         }
         for (feed in resolved) {
-            callback(newExtractorLink(name, "$name – ${feed.label}", feed.url, ExtractorLinkType.M3U8) {
+            mediaTracks.publish(newExtractorLink(name, "$name – ${feed.label}", feed.url, ExtractorLinkType.M3U8) {
                 referer = feed.referer
                 headers = requestHeaders
                 extractorData = "sportsbite-media-v1"
-            })
+            }, callback, feed.manifest, feed.manifestUrl)
         }
         if (resolved.isEmpty()) throw ErrorLoadingException("No working Sportsbite playlist is available right now. The event may not have started, may have ended, or the upstream channel may be offline.")
         return true

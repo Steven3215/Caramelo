@@ -1,4 +1,4 @@
-version = 2
+version = 3
 cloudstream {
     description = "Tele Libre live TV categories with mirror fallback and direct HLS playback where available."
     authors = listOf("Caramelo")

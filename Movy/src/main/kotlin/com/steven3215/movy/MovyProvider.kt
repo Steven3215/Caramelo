@@ -1,5 +1,6 @@
 package com.steven3215.movy
 
+import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -136,6 +137,7 @@ internal class MovyProvider(private val settings: MovySettings) : MainAPI() {
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         val item = MovyProtocol.item(data)
         if (item.type == "tv" && (item.season == null || item.episode == null)) throw ErrorLoadingException("Choose an episode first")
         val selected = settings.servers()
@@ -146,29 +148,33 @@ internal class MovyProvider(private val settings: MovySettings) : MainAPI() {
             try { sources(server, item, details, nonce)?.let { server to it } }
             catch (error: Exception) { if (error is CancellationException) throw error; null }
         } }.awaitAll().filterNotNull() }
-        val subtitles = resolved.flatMap { it.second.items("subtitles") }.distinctBy { it.text("url") }
-        for (sub in subtitles) {
-            val url = sub.text("url")?.takeIf { MovyProtocol.webUrl(it) } ?: continue
-            subtitleCallback(SubtitleFile(sub.text("language") ?: sub.text("lang") ?: sub.text("label") ?: "Unknown", url))
+        for ((_, body) in resolved) {
+            mediaTracks.sidecars(body.items("subtitles") + body.items("tracks"), MovyProtocol.STREAMS + "/",
+                headers + ("Referer" to "$mainUrl/"))
         }
         val streams = resolved.flatMap { (server, body) -> body.items("sources").filter {
             when (server) { "austin" -> it.text("quality") == "English"; "delhi" -> it.text("quality") == "Hindi"; else -> true }
         }.map { server to it } }.filter { MovyProtocol.webUrl(it.second.text("url")) }.distinctBy { it.second.text("url") }.take(48)
+        data class VerifiedStream(val server: String, val source: JsonNode, val type: ExtractorLinkType,
+                                  val manifest: String?, val manifestUrl: String)
         val verified = coroutineScope { streams.map { (server, source) -> async {
             val url = source.text("url").orEmpty()
             try {
                 val video = URI(url).path.endsWith(".mp4", true)
-                if (!video) {
+                val playlist = if (!video) {
                     val response = gate.withPermit { app.get(url, headers = headers - "Accept", referer = "$mainUrl/", timeout = 12) }
                     if (response.code !in 200..299 || !response.text.trimStart('\uFEFF', ' ', '\n', '\r').startsWith("#EXTM3U")) return@async null
-                }
-                Triple(server, source, if (video) ExtractorLinkType.VIDEO else ExtractorLinkType.M3U8)
+                    response
+                } else null
+                VerifiedStream(server, source, if (video) ExtractorLinkType.VIDEO else ExtractorLinkType.M3U8,
+                    playlist?.text, playlist?.url ?: url)
             } catch (error: Exception) { if (error is CancellationException) throw error; null }
         } }.awaitAll().filterNotNull() }
-        for ((server, source, type) in verified) {
-            callback(newExtractorLink(name, "$name – ${MovyProtocol.servers[server]} · ${source.text("quality") ?: "Auto"}", source.text("url").orEmpty(), type) {
+        for (stream in verified) {
+            val (server, source, type) = stream
+            mediaTracks.publish(newExtractorLink(name, "$name – ${MovyProtocol.servers[server]} · ${source.text("quality") ?: "Auto"}", source.text("url").orEmpty(), type) {
                 referer = "$mainUrl/"; quality = getQualityFromName(source.text("quality")); this.headers = this@MovyProvider.headers - "Accept"
-            })
+            }, callback, stream.manifest, stream.manifestUrl, audio = source.text("audio_language") ?: source.text("language") ?: MovyProtocol.audioLanguages[server])
         }
         if (verified.isEmpty()) throw ErrorLoadingException("No working Movy stream was found. Try another server in extension settings.")
         return true

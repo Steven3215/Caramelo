@@ -1,5 +1,6 @@
 package com.caramelo.justanime
 
+import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -85,6 +86,7 @@ class JustAnimeProvider : MainAPI() {
         uri.scheme == "https" && uri.host != null && uri.userInfo == null
     }.getOrDefault(false)
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         if (!data.matches(Regex("[1-9][0-9]{0,8}/[1-9][0-9]{0,5}"))) return false
         val (id, ep) = data.split('/')
         val path = "/watch/$id/episode/$ep"
@@ -94,7 +96,6 @@ class JustAnimeProvider : MainAPI() {
         val advertised = audioTypes.filter { audio -> serverOrder.any { servers.path(it).path(audio).asBoolean() } }
         val verifiedAudio = mutableSetOf<String>()
         val emitted = mutableSetOf<String>()
-        val tracks = mutableSetOf<String>()
         for (server in serverOrder) {
             val availability = servers.path(server)
             val available = audioTypes.filter { availability.path(it).asBoolean() }
@@ -115,17 +116,14 @@ class JustAnimeProvider : MainAPI() {
                         if (response.code !in 200..299 || !response.text.trimStart().startsWith("#EXTM3U")) continue
                         emitted.add(url)
                         verifiedAudio.add(audio)
-                        callback(newExtractorLink(name, "$name – $server (${audio.uppercase()})", url, ExtractorLinkType.M3U8) {
+                        mediaTracks.publish(newExtractorLink(name, "$name – $server", url, ExtractorLinkType.M3U8) {
                             this.referer = referer
                             this.headers = headers
                             quality = getQualityFromName(source.string("quality"))
-                        })
+                        }, callback, response.text, response.url, audio = if (audio == "dub") "Dubbed" else "Original")
                     }
-                    for (track in group.path("subtitles").toList() + group.path("tracks").toList()) {
-                        if (track.string("kind") == "thumbnails") continue
-                        val url = (track.string("url") ?: track.string("file"))?.takeIf { web(it) && tracks.add(it) } ?: continue
-                        subtitleCallback(SubtitleFile(track.string("label") ?: track.string("lang") ?: "Subtitle", url))
-                    }
+                    mediaTracks.sidecars(group.path("subtitles").toList() + group.path("tracks").toList(), apiBase + "/",
+                        mapOf("Origin" to mainUrl, "Referer" to "$mainUrl/"))
                 }
                 if (emitted.size >= 2 && advertised.all { it in verifiedAudio }) break
             } catch (error: Exception) { if (error is CancellationException) throw error }

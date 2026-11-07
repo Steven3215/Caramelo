@@ -1,5 +1,6 @@
 package com.caramelo.teleonline
 
+import com.caramelo.tracks.MediaTracks
 import com.caramelo.settings.ChannelRows
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -52,6 +53,7 @@ class TeleonlineProvider internal constructor(private val settings: ChannelRows)
         }
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         val url = TeleonlineProtocol.channel(data)
         val html = app.get(url, timeout = 25).text
         val noReferrer = Regex("NEEDS_NOREFERRER\\s*=\\s*true").containsMatchIn(html)
@@ -60,7 +62,7 @@ class TeleonlineProvider internal constructor(private val settings: ChannelRows)
             val referer = if (noReferrer) "" else url
             val response = app.get(link, referer = referer, timeout = 15)
             if (response.code in 200..299 && response.text.trimStart().startsWith("#EXTM3U")) {
-                callback(newExtractorLink(name, "$name – Signal ${++count}", link, ExtractorLinkType.M3U8) { this.referer = referer })
+                mediaTracks.publish(newExtractorLink(name, "$name – Signal ${++count}", link, ExtractorLinkType.M3U8) { this.referer = referer }, callback, response.text, response.url)
             }
         } catch (error: Exception) { if (error is java.util.concurrent.CancellationException) throw error }
         if (count == 0) throw ErrorLoadingException("No supported Teleonline HLS signal is available for this channel. Signals can be offline or region restricted.")

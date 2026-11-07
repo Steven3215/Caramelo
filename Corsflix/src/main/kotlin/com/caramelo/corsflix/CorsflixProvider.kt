@@ -1,5 +1,6 @@
 package com.caramelo.corsflix
 
+import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -109,6 +110,7 @@ internal class CorsflixProvider(private val settings: CorsflixSettings) : MainAP
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         val item = CorsflixProtocol.item(data)
         if (item.type == "tv" && item.episode == null) throw ErrorLoadingException("Choose an episode first")
         val found = linkedSetOf<String>()
@@ -117,10 +119,10 @@ internal class CorsflixProvider(private val settings: CorsflixSettings) : MainAP
             val response = app.get(link, headers = requestHeaders, referer = referer, timeout = 12)
             if (response.code !in 200..299 || !response.text.trimStart().startsWith("#EXTM3U")) return
             found.add(link)
-            callback(newExtractorLink(name, "$name – $server", link, ExtractorLinkType.M3U8) {
+            mediaTracks.publish(newExtractorLink(name, "$name – $server", link, ExtractorLinkType.M3U8) {
                 this.referer = referer.orEmpty()
                 this.headers = requestHeaders
-            })
+            }, callback, response.text, response.url)
         }
         if ("twoembed" in settings.servers()) try {
             val embed = if (item.type == "movie") "https://www.2embed.cc/embed/${item.id}"

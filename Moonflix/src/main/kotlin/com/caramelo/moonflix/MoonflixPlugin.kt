@@ -1,5 +1,6 @@
 package com.caramelo.moonflix
 
+import com.caramelo.tracks.MediaTracks
 import android.content.Context
 import com.caramelo.movies.BrowserMovieProvider
 import com.fasterxml.jackson.databind.JsonNode
@@ -57,6 +58,7 @@ internal class MoonflixProvider : BrowserMovieProvider() {
         return newHomePageResponse(request, response.path("results").mapNotNull { card(it, type) }, page < response.path("total_pages").asInt(page))
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         if (isCasting) return false
         val item = parsePlayback(data) ?: return false
         val params = buildMap {
@@ -84,11 +86,13 @@ internal class MoonflixProvider : BrowserMovieProvider() {
                 val manifest = app.get(link, headers = headers, referer = "$origin/", timeout = 15)
                 if (manifest.code !in 200..299 || !manifest.text.trimStart().startsWith("#EXTM3U")) continue
                 emitted.add(link)
-                callback(newExtractorLink(name, "$name – Direct HLS ${emitted.size}", link, ExtractorLinkType.M3U8) {
+                mediaTracks.publish(newExtractorLink(name, "$name – Direct HLS ${emitted.size}", link, ExtractorLinkType.M3U8) {
                     referer = "$origin/"
                     this.headers = headers
                     extractorData = transport
-                })
+                }, callback, manifest.text, manifest.url)
+                mediaTracks.sidecars(bundle.path("subtitles").toList() + bundle.path("tracks").toList(),
+                    manifest.url, headers + ("Referer" to "$origin/"))
             }
         } catch (error: Exception) { if (error is CancellationException) throw error }
         if (emitted.isEmpty()) throw ErrorLoadingException("Moonflix has no direct stream available for this title")

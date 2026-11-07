@@ -47,6 +47,8 @@ subprojects {
     val sharedSettings = name in setOf("Sportsbite", "GlobalFreeTV", "Teleonline", "TeleLibre")
     val sharedMovies = name in setOf("Lightflix", "Nexa", "Moonflix")
     android {
+        sourceSets.getByName("main").java.srcDir(rootProject.file("shared-tracks/src/main/kotlin"))
+        if (project.name == "CinemaArmy") sourceSets.getByName("test").java.srcDir(rootProject.file("shared-tracks/src/test/kotlin"))
         if (sharedMovies) sourceSets.getByName("main").java.srcDir(rootProject.file("shared-movies/src/main/kotlin"))
         if (sharedSettings) {
             sourceSets.getByName("main").java.srcDir(rootProject.file("shared-settings/src/main/kotlin"))

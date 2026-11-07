@@ -1,4 +1,4 @@
-version = 1
+version = 2
 cloudstream {
     description = "Moonflix movies and TV with direct HLS sources where available."
     authors = listOf("Caramelo")

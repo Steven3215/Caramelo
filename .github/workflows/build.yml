@@ -27,6 +27,7 @@ on:
       - 'tools/smoke_teletv.py'
       - 'tools/smoke_justanime_thugtv.py'
       - 'shared-settings/**'
+      - 'shared-tracks/**'
       - '*.gradle.kts'
       - 'gradle.properties'
       - '.github/workflows/build.yml'

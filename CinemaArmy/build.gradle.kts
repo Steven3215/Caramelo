@@ -1,4 +1,4 @@
-version = 2
+version = 3
 
 cloudstream {
     description = "Cinema Army movies and TV shows. Initial implementation; device testing pending."

@@ -1,4 +1,4 @@
-version = 1
+version = 2
 cloudstream {
     description = "Nekowatch anime with SUB/DUB episodes and signed HLS/file playback. Device testing pending."
     authors = listOf("Caramelo")

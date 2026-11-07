@@ -1,4 +1,4 @@
-version = 5
+version = 6
 cloudstream {
     description = "Sportsbite Sports and Live TV, with configurable homepage categories, countries and filters. Local playback; device testing pending."
     authors = listOf("Caramelo")

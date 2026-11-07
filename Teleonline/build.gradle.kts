@@ -1,4 +1,4 @@
-version = 1
+version = 2
 cloudstream {
     description = "Worldwide Teleonline live channels with category/country row selection. Direct HLS and supported embeds; device testing pending."
     authors = listOf("Caramelo")

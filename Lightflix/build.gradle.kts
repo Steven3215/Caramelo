@@ -1,4 +1,4 @@
-version = 1
+version = 2
 cloudstream {
     description = "Lightflix movie and TV catalog. Experimental Android browser playback."
     authors = listOf("Caramelo")

@@ -1,8 +1,9 @@
 package com.caramelo.sololatino
 
+import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.network.WebViewResolver
+import com.caramelo.tracks.browserMedia
 import com.lagradost.cloudstream3.utils.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -107,30 +108,24 @@ class SoloLatinoProvider : MainAPI() {
                 val link = json.readTree(response.text).path("url").asText()
                 val uri = URI(link)
                 link.takeIf { uri.scheme == "https" && uri.userInfo == null &&
-                    (uri.host in playerHosts || uri.path.endsWith(".m3u8", true)) }
+                    (uri.host in playerHosts || uri.path.endsWith(".m3u8", true) || uri.path.endsWith(".mp4", true)) }
             } catch (error: Exception) { if (error is CancellationException) throw error; null }
         }.distinct()
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         if (isCasting) return false
         val url = canonical(data, allowEpisode = true) ?: return false
         val options = embedOptions(url)
         if (options.isEmpty()) throw ErrorLoadingException("SoloLatino returned no anonymous playback options")
-        for (option in options.take(2)) try {
-            val direct = URI(option).path.endsWith(".m3u8", true)
-            val media = if (direct) option else {
-                val resolver = WebViewResolver(interceptUrl = Regex("\\.m3u8(?:[?#]|$)", RegexOption.IGNORE_CASE),
-                    useOkhttp = false, timeout = 25_000L)
-                app.get(option, referer = url, interceptor = resolver).url
-            }
-            val uri = URI(media)
-            if (uri.scheme != "https" || uri.host == null || uri.userInfo != null || !uri.path.endsWith(".m3u8", true)) continue
-            val referer = if (direct) url else option
-            val manifest = app.get(media, referer = referer, timeout = 12)
-            if (manifest.code !in 200..299 || !manifest.text.trimStart().startsWith("#EXTM3U")) continue
-            callback(newExtractorLink(name, "$name – Español", media, ExtractorLinkType.M3U8) { this.referer = referer })
+        for (option in options) try {
+            val media = browserMedia(option, url, allowMp4 = true) ?: continue
+            mediaTracks.publish(newExtractorLink(name, "$name – ${URI(option).host}", media.url, media.type) {
+                referer = media.referer
+                headers = media.headers
+            }, callback, media.manifest, media.manifestUrl)
             return true
         } catch (error: Exception) { if (error is CancellationException) throw error }
-        throw ErrorLoadingException("SoloLatino's Android browser player did not return a playable HLS stream")
+        throw ErrorLoadingException("SoloLatino returned player pages, but none exposed a playable HLS or MP4 stream")
     }
 }

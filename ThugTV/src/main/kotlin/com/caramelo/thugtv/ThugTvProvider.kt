@@ -1,5 +1,6 @@
 package com.caramelo.thugtv
 
+import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -142,6 +143,7 @@ class ThugTvProvider : MainAPI() {
         uri.scheme == "https" && uri.host != null && uri.userInfo == null
     }.getOrDefault(false)
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         if (!data.matches(Regex("(?:movie/[1-9][0-9]{0,8}|tv/[1-9][0-9]{0,8}/[0-9]{1,4}/[1-9][0-9]{0,4})"))) return false
         val sources = api("/stream/$data").path("sources")
         val emitted = mutableSetOf<String>()
@@ -155,14 +157,12 @@ class ThugTvProvider : MainAPI() {
             if (response.code !in 200..299 || !response.text.trimStart().startsWith("#EXTM3U")) continue
             emitted.add(url)
             val server = result.string("label") ?: source.string("name") ?: name
-            callback(newExtractorLink(name, "$name – $server", url, ExtractorLinkType.M3U8) {
+            mediaTracks.publish(newExtractorLink(name, "$name – $server", url, ExtractorLinkType.M3U8) {
                 referer = "$mainUrl/"
                 this.headers = this@ThugTvProvider.headers
-            })
-            for (track in result.path("subtitles")) {
-                val file = (track.string("url") ?: track.string("file"))?.takeIf { web(it) } ?: continue
-                subtitleCallback(SubtitleFile(track.string("label") ?: track.string("lang") ?: "Subtitle", file))
-            }
+            }, callback, response.text, response.url)
+            mediaTracks.sidecars(result.path("subtitles").toList() + result.path("tracks").toList(), url,
+                headers + ("Referer" to "$mainUrl/"))
         } catch (error: Exception) { if (error is CancellationException) throw error }
         if (emitted.isEmpty()) for (source in sources.filter { it.string("type") == "embed" }.take(4)) {
             val url = source.string("url")?.takeIf { web(it) } ?: continue

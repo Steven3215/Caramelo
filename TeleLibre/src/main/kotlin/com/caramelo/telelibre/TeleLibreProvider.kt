@@ -1,5 +1,6 @@
 package com.caramelo.telelibre
 
+import com.caramelo.tracks.MediaTracks
 import com.caramelo.settings.ChannelRows
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
@@ -84,6 +85,7 @@ class TeleLibreProvider internal constructor(private val settings: ChannelRows) 
     }.getOrDefault(false)
 
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         val slug = slug(data) ?: return false
         if (directory().none { it.slug == slug }) return false
         val emitted = mutableSetOf<String>()
@@ -92,7 +94,7 @@ class TeleLibreProvider internal constructor(private val settings: ChannelRows) 
             val response = app.get(url, referer = referer, timeout = 12)
             if (response.code !in 200..299 || !response.text.trimStart().startsWith("#EXTM3U")) return
             emitted.add(url)
-            callback(newExtractorLink(name, "$name – Signal " + emitted.size, url, ExtractorLinkType.M3U8) { this.referer = referer })
+            mediaTracks.publish(newExtractorLink(name, "$name – Signal " + emitted.size, url, ExtractorLinkType.M3U8) { this.referer = referer }, callback, response.text, response.url)
         }
         for (base in mirrors) {
             val channelUrl = channelUrl(slug, base)

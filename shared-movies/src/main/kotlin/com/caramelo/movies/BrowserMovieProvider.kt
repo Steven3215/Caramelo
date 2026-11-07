@@ -1,10 +1,11 @@
 package com.caramelo.movies
 
+import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addScore
-import com.lagradost.cloudstream3.network.WebViewResolver
+import com.caramelo.tracks.browserMedia
 import com.lagradost.cloudstream3.utils.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -116,21 +117,18 @@ internal abstract class BrowserMovieProvider : MainAPI() {
         return MovieId(pieces[0], pieces[1].toInt(), pieces.getOrNull(2)?.toInt(), pieces.getOrNull(3)?.toInt())
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
+        val mediaTracks = MediaTracks(subtitleCallback)
         if (isCasting) return false
         val item = parsePlayback(data) ?: return false
         val page = player(item) ?: return false
-        val resolver = WebViewResolver(interceptUrl = Regex("\\.m3u8(?:[?#]|$)", RegexOption.IGNORE_CASE),
-            useOkhttp = false, timeout = 25_000L)
         try {
-            val link = app.get(page, referer = "$mainUrl/", interceptor = resolver).url
-            val uri = URI(link)
-            if (uri.scheme == "https" && uri.host != null && uri.userInfo == null && uri.path.endsWith(".m3u8", true)) {
-                val referrer = URI(page).let { "${it.scheme}://${it.host}/" }
-                val manifest = app.get(link, referer = referrer, timeout = 12)
-                if (manifest.code in 200..299 && manifest.text.trimStart().startsWith("#EXTM3U")) {
-                    callback(newExtractorLink(name, "$name – Browser player", link, ExtractorLinkType.M3U8) { referer = referrer })
-                    return true
-                }
+            val media = browserMedia(page, "$mainUrl/")
+            if (media != null) {
+                mediaTracks.publish(newExtractorLink(name, "$name – Browser player", media.url, media.type) {
+                    referer = media.referer
+                    headers = media.headers
+                }, callback, media.manifest, media.manifestUrl)
+                return true
             }
         } catch (error: Exception) { if (error is CancellationException) throw error }
         throw ErrorLoadingException("$name's Android browser player did not return a playable HLS stream")
