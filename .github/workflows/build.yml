@@ -15,7 +15,10 @@ on:
       - 'AnimeSuge/**'
       - 'Teleonline/**'
       - 'TeleLibre/**'
+      - 'JustAnime/**'
+      - 'ThugTV/**'
       - 'tools/smoke_teletv.py'
+      - 'tools/smoke_justanime_thugtv.py'
       - 'shared-settings/**'
       - '*.gradle.kts'
       - 'gradle.properties'
@@ -69,6 +72,9 @@ jobs:
       - name: Live Teleonline and Tele Libre directory and broadcaster smoke test
         continue-on-error: true
         run: python3 tools/smoke_teletv.py
+      - name: Live JustAnime and ThugTV catalog and media smoke test
+        continue-on-error: true
+        run: python3 tools/smoke_justanime_thugtv.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -81,7 +87,7 @@ jobs:
         with:
           gradle-version: '8.12'
       - name: Unit tests and extension build
-        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest Nekowatch:testDebugUnitTest AnimeSuge:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make Nekowatch:make AnimeSuge:make Teleonline:testDebugUnitTest TeleLibre:testDebugUnitTest Teleonline:make TeleLibre:make --stacktrace
+        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest Nekowatch:testDebugUnitTest AnimeSuge:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make Nekowatch:make AnimeSuge:make Teleonline:testDebugUnitTest TeleLibre:testDebugUnitTest Teleonline:make TeleLibre:make JustAnime:make ThugTV:make --stacktrace
       - name: Save compiled extensions
         uses: actions/upload-artifact@v4
         with:

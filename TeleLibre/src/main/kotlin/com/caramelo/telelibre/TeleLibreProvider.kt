@@ -76,7 +76,7 @@ class TeleLibreProvider internal constructor(private val settings: ChannelRows) 
     }
     private suspend fun page(url: String, referer: String): Document? {
         val response = app.get(url, referer = referer, timeout = 12)
-        return response.takeIf { it.code in 200..299 }?.document
+        return response.takeIf { it.code in 200..299 }?.let { org.jsoup.Jsoup.parse(it.text, it.url) }
     }
     private fun media(url: String) = runCatching {
         val uri = URI(url)
