@@ -1,4 +1,4 @@
-version = 3
+version = 4
 cloudstream {
     description = "Nexa movie and TV catalog. Experimental Android browser playback."
     authors = listOf("Caramelo")

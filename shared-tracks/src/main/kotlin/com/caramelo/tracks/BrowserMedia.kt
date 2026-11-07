@@ -1,8 +1,20 @@
 package com.caramelo.tracks
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import com.lagradost.api.getContext
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.network.WebViewResolver
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import okhttp3.Request
 import java.net.URI
 
 internal data class BrowserMedia(
@@ -25,9 +37,12 @@ internal suspend fun browserMedia(
     val request = if (direct) null else {
         val extensions = if (allowMp4) "(?:m3u8|mp4)" else "m3u8"
         val hlsPath = extensionlessHlsPath?.let { "|^https://[^/?#]+${Regex.escape(it)}" }.orEmpty()
-        WebViewResolver(interceptUrl = Regex("(?:\\.$extensions$hlsPath)(?:[?#]|$)", RegexOption.IGNORE_CASE),
-            useOkhttp = false, timeout = 25_000L)
-            .resolveUsingWebView(page, referer = referer, headers = emptyMap()).first ?: return null
+        val match = Regex("(?:\\.$extensions$hlsPath)(?:[?#]|$)", RegexOption.IGNORE_CASE)
+        val captured = if (extensionlessHlsPath == null) {
+            WebViewResolver(interceptUrl = match, useOkhttp = false, timeout = 25_000L)
+                .resolveUsingWebView(page, referer = referer, headers = emptyMap()).first
+        } else captureMediaWithPageResources(page, referer, match)
+        captured ?: return null
     }
     if (request != null && request.method != "GET") return null
     val url = HlsTracks.webUrl(null, request?.url?.toString() ?: page)?.takeIf { it.startsWith("https://") } ?: return null
@@ -54,3 +69,45 @@ internal suspend fun browserMedia(
         else -> null
     }
 }
+
+// Nexa uses Svelte's CSS preloader. A failed stylesheet prevents its player module from starting.
+@SuppressLint("SetJavaScriptEnabled")
+private suspend fun captureMediaWithPageResources(page: String, referer: String, match: Regex): Request? =
+    withContext(Dispatchers.Main.immediate) {
+        val context = getContext() as? Context ?: return@withContext null
+        val view = WebView(context)
+        val result = CompletableDeferred<Request>()
+        try {
+            val agent = view.settings.userAgentString
+            view.settings.apply {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                allowFileAccess = false
+                allowContentAccess = false
+            }
+            view.webViewClient = object : WebViewClient() {
+                override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+                    val url = request.url.toString()
+                    if (request.method != "GET" || request.isForMainFrame || request.url.scheme != "https" ||
+                        !match.containsMatchIn(url)) return null
+
+                    val candidate = runCatching {
+                        Request.Builder().url(url).apply {
+                            for (key in listOf("Origin", "Referer", "User-Agent")) {
+                                val value = request.requestHeaders.entries.firstOrNull { it.key.equals(key, true) }?.value
+                                    ?: if (key == "User-Agent") agent else null
+                                if (!value.isNullOrBlank()) header(key, value)
+                            }
+                        }.build()
+                    }.getOrNull() ?: return null
+                    if (!result.complete(candidate)) return null
+                    return WebResourceResponse("text/plain", "UTF-8", null)
+                }
+            }
+            view.loadUrl(page, mapOf("Referer" to referer))
+            withTimeoutOrNull(40_000L) { result.await() }
+        } finally {
+            view.stopLoading()
+            view.destroy()
+        }
+    }
