@@ -234,5 +234,85 @@
     "language": "en",
     "fileSize": 22081,
     "fileHash": "sha256-cb1976af68217ea535619a8352d9c2ffd768a910426d03d11b3664645a76b286"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Lightflix.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "Lightflix",
+    "internalName": "Lightflix",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Movies and series with search and episode lists. Catalog verified. Experimental Android browser playback.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "language": "en",
+    "fileSize": 25551,
+    "fileHash": "sha256-b292f3987dd8353d3ec6e43c683312d50fe923494f2bfa5021ad3d3c79511062"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Moonflix.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "Moonflix",
+    "internalName": "Moonflix",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Movies and series with direct HLS playback where available. A direct media sample passed. Device testing pending.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "language": "en",
+    "fileSize": 31362,
+    "fileHash": "sha256-5da59783e0bcd27db3103b799dc950f167bf8968c0f2c466756fb0e4a5251f39"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Nexa.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "Nexa",
+    "internalName": "Nexa",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Movie and series catalog, search and episodes. Experimental Android browser playback.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "language": "en",
+    "fileSize": 25802,
+    "fileHash": "sha256-858f2dd0f12a1a1cec1f52d73712429b2c5f70394079328bb43c19062bfa8705"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/SoloLatino.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "SoloLatino",
+    "internalName": "SoloLatino",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Spanish movie and series catalog with episode lists. Anonymous embeds verified locally. Experimental Android browser playback.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "language": "es",
+    "fileSize": 20656,
+    "fileHash": "sha256-c97470afea0c60095b8e5fee8f22c7dfdb8437c307871f04dee460177fdc19f4"
   }
 ]
