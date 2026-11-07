@@ -13,10 +13,10 @@ import java.net.URI
 
 @CloudstreamPlugin
 class NexaPlugin : Plugin() {
-    override fun load(context: Context) { registerMainAPI(NexaProvider(context.applicationContext)) }
+    override fun load(context: Context) { registerMainAPI(NexaProvider()) }
 }
 
-internal class NexaProvider(context: Context) : BrowserMovieProvider(context) {
+internal class NexaProvider : BrowserMovieProvider() {
     override var name = "Nexa"
     override var mainUrl = "https://nexa.mov"
     override val extensionlessHlsPath = "/cdn-m3u8"
