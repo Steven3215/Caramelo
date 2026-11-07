@@ -31,14 +31,15 @@ internal suspend fun browserMedia(
     page: String,
     referer: String,
     allowMp4: Boolean = false,
-    extensionlessHlsPath: String? = null
+    extensionlessHlsPath: String? = null,
+    preservePageResources: Boolean = false
 ): BrowserMedia? {
     val direct = HlsTracks.extension(page) == "m3u8" || (allowMp4 && HlsTracks.extension(page) == "mp4")
     val request = if (direct) null else {
         val extensions = if (allowMp4) "(?:m3u8|mp4)" else "m3u8"
         val hlsPath = extensionlessHlsPath?.let { "|^https://[^/?#]+${Regex.escape(it)}" }.orEmpty()
         val match = Regex("(?:\\.$extensions$hlsPath)(?:[?#]|$)", RegexOption.IGNORE_CASE)
-        val captured = if (extensionlessHlsPath == null) {
+        val captured = if (!preservePageResources) {
             WebViewResolver(interceptUrl = match, useOkhttp = false, timeout = 25_000L)
                 .resolveUsingWebView(page, referer = referer, headers = emptyMap()).first
         } else captureMediaWithPageResources(page, referer, match)
@@ -70,7 +71,7 @@ internal suspend fun browserMedia(
     }
 }
 
-// Nexa uses Svelte's CSS preloader. A failed stylesheet prevents its player module from starting.
+// Player frameworks can abort initialization if their stylesheet preloads fail.
 @SuppressLint("SetJavaScriptEnabled")
 private suspend fun captureMediaWithPageResources(page: String, referer: String, match: Regex): Request? =
     withContext(Dispatchers.Main.immediate) {
