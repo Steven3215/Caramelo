@@ -1,0 +1,8 @@
+{
+  "name": "Caramelo Playback Test",
+  "description": "Stable-context emulator playback candidates",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/Steven3215/Caramelo/android-emulator-playback-check/runtime-test-v2/plugins.json"
+  ]
+}
