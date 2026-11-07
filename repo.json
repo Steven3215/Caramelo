@@ -3,6 +3,6 @@
   "description": "Caramelo movie, anime, sports and worldwide live TV extensions",
   "manifestVersion": 1,
   "pluginLists": [
-    "https://raw.githubusercontent.com/Steven3215/Caramelo/main/plugins.json"
+    "https://raw.githubusercontent.com/Steven3215/Caramelo/4c23eace25973253077d7e5d83beed9ef48d799c/plugins.json"
   ]
 }

@@ -173,7 +173,7 @@ Full repository URL (fallback):
 https://raw.githubusercontent.com/Steven3215/Caramelo/main/repo.json
 
 The shortcode redirects directly to this feed. Compiled downloads are published
-under downloads/ and verified using the SHA-256 checksum in plugins.json.
+under `downloads/` and verified using the SHA-256 checksum in `plugins.json`.
 
 ## Build and release updates
 
@@ -181,10 +181,16 @@ The GitHub Actions build workflow runs unit tests and packages a .cs3 artifact.
 It also runs a non-blocking live API and HLS playlist check using Night of the
 Living Dead (1968). Artifacts expire after seven days.
 
-To publish a new version, replace the matching .cs3 file under downloads/ and update its version,
-fileSize and fileHash in plugins.json together. The feed URL and shortcode remain
-unchanged. The current build workflow produces artifacts; it does not automatically
-replace the published download.
+To publish a new version:
+
+1. Commit the new `.cs3` files under `downloads/`.
+2. Update each changed entry in `plugins.json` with its version, file size, SHA-256 checksum and
+   a raw download URL pinned to the commit containing that package. Keep unchanged entries pinned.
+3. Commit `plugins.json`, then update `repo.json` to point to `plugins.json` at that commit. Verify
+   the published checksums using the exact download URLs in the feed.
+
+The repository URL and shortcode stay the same. Pinning each link keeps older cached lists
+paired with the packages they describe. The build workflow produces artifacts for manual publication.
 
 For local builds, first check out the public build plugin at
 `build-tools/cloudstream-gradle`, revision
