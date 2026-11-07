@@ -3,4 +3,4 @@ pluginManagement {
 }
 
 rootProject.name = "Caramelo"
-include("UniqueStreamAnime", "Corsflix", "CinemaArmy", "GlobalFreeTV", "Sportsbite", "Movy")
+include("UniqueStreamAnime", "Corsflix", "CinemaArmy", "GlobalFreeTV", "Sportsbite", "Movy", "DominicanChannels")
