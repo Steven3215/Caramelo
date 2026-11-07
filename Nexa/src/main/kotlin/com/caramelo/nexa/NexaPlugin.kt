@@ -19,6 +19,7 @@ class NexaPlugin : Plugin() {
 internal class NexaProvider : BrowserMovieProvider() {
     override var name = "Nexa"
     override var mainUrl = "https://nexa.mov"
+    override val extensionlessHlsPath = "/cdn-m3u8"
     override var sequentialMainPage = true
     override val mainPage = mainPageOf("top10" to "Top 10", "trending-week" to "Trending This Week",
         "acclaimed-films" to "Acclaimed Films", "airing-now" to "Currently Airing", "acclaimed-series" to "Critically Acclaimed Series",

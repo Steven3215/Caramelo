@@ -3,6 +3,7 @@ package com.caramelo.tracks
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.network.WebViewResolver
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
+import java.net.URI
 
 internal data class BrowserMedia(
     val url: String,
@@ -14,11 +15,17 @@ internal data class BrowserMedia(
 )
 
 /** Resolve only media requested by the embed's ordinary player. */
-internal suspend fun browserMedia(page: String, referer: String, allowMp4: Boolean = false): BrowserMedia? {
+internal suspend fun browserMedia(
+    page: String,
+    referer: String,
+    allowMp4: Boolean = false,
+    extensionlessHlsPath: String? = null
+): BrowserMedia? {
     val direct = HlsTracks.extension(page) == "m3u8" || (allowMp4 && HlsTracks.extension(page) == "mp4")
     val request = if (direct) null else {
         val extensions = if (allowMp4) "(?:m3u8|mp4)" else "m3u8"
-        WebViewResolver(interceptUrl = Regex("\\.$extensions(?:[?#]|$)", RegexOption.IGNORE_CASE),
+        val hlsPath = extensionlessHlsPath?.let { "|^https://[^/?#]+${Regex.escape(it)}" }.orEmpty()
+        WebViewResolver(interceptUrl = Regex("(?:\\.$extensions$hlsPath)(?:[?#]|$)", RegexOption.IGNORE_CASE),
             useOkhttp = false, timeout = 25_000L)
             .resolveUsingWebView(page, referer = referer, headers = emptyMap()).first ?: return null
     }
@@ -26,7 +33,9 @@ internal suspend fun browserMedia(page: String, referer: String, allowMp4: Boole
     val url = HlsTracks.webUrl(null, request?.url?.toString() ?: page)?.takeIf { it.startsWith("https://") } ?: return null
     val referrer = request?.header("Referer") ?: referer
     val headers = listOf("Origin", "User-Agent").mapNotNull { key -> request?.header(key)?.let { key to it } }.toMap()
-    return when (HlsTracks.extension(url)) {
+    val extension = if (extensionlessHlsPath != null && URI(url).path == extensionlessHlsPath) "m3u8"
+        else HlsTracks.extension(url)
+    return when (extension) {
         "m3u8" -> {
             val response = app.get(url, headers = headers, referer = referrer, timeout = 12)
             val manifest = response.text

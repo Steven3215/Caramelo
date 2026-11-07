@@ -28,6 +28,7 @@ internal abstract class BrowserMovieProvider : MainAPI() {
     private val gate = Semaphore(4)
     protected abstract suspend fun metadata(path: String): JsonNode
     protected open fun player(item: MovieId): String? = null
+    protected open val extensionlessHlsPath: String? = null
     protected open fun titleUrl(item: MovieId) = "$mainUrl/${item.type}/${item.id}"
     protected open fun parseTitle(url: String): MovieId {
         val uri = URI(url)
@@ -122,7 +123,7 @@ internal abstract class BrowserMovieProvider : MainAPI() {
         val item = parsePlayback(data) ?: return false
         val page = player(item) ?: return false
         try {
-            val media = browserMedia(page, "$mainUrl/")
+            val media = browserMedia(page, "$mainUrl/", extensionlessHlsPath = extensionlessHlsPath)
             if (media != null) {
                 mediaTracks.publish(newExtractorLink(name, "$name – Browser player", media.url, media.type) {
                     referer = media.referer
