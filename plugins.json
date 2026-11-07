@@ -158,9 +158,9 @@
     "fileHash": "sha256-ce8c9c21144c16102ed5a46d24a6106b7a1b9e1efe7357c7b4ec7e17f257b65d"
   },
   {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/53dd6c0dbcfa65c83433f9d7a22254f49d044e77/downloads/Teleonline.cs3",
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/d8dfe686f77a4541f5d9baef555c3e24b174b800/downloads/Teleonline.cs3",
     "status": 3,
-    "version": 3,
+    "version": 4,
     "apiVersion": 1,
     "name": "Teleonline",
     "internalName": "Teleonline",
@@ -173,13 +173,13 @@
       "Live"
     ],
     "language": "es",
-    "fileSize": 53591,
-    "fileHash": "sha256-87ee3034faf460f7daf136d97e000ddf9adbbe6281924336d1f30db6f132a10a"
+    "fileSize": 56968,
+    "fileHash": "sha256-7d1ec8892119a5f25fcce34b1ba42dfd230eec086eb7d607c5c82c59298a018d"
   },
   {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/TeleLibre.cs3",
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/d8dfe686f77a4541f5d9baef555c3e24b174b800/downloads/TeleLibre.cs3",
     "status": 3,
-    "version": 3,
+    "version": 4,
     "apiVersion": 1,
     "name": "Tele Libre",
     "internalName": "TeleLibre",
@@ -192,13 +192,13 @@
       "Live"
     ],
     "language": "es",
-    "fileSize": 58185,
-    "fileHash": "sha256-5bd5e7fb37cab21e86f8bde9eb1aba61169a38b928a69644f9664a2aa6209741"
+    "fileSize": 62513,
+    "fileHash": "sha256-a3bff473190293cbddee5f9e0e6df3bdc6febac3b2c6be36fb88453996e9a53a"
   },
   {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/53dd6c0dbcfa65c83433f9d7a22254f49d044e77/downloads/JustAnime.cs3",
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/d8dfe686f77a4541f5d9baef555c3e24b174b800/downloads/JustAnime.cs3",
     "status": 3,
-    "version": 4,
+    "version": 5,
     "apiVersion": 1,
     "name": "JustAnime",
     "internalName": "JustAnime",
@@ -212,8 +212,8 @@
       "AnimeMovie"
     ],
     "language": "en",
-    "fileSize": 41279,
-    "fileHash": "sha256-bf9e1ed4118a9acb0c431286a515f53bccb5aad49e4ffb8dbbae70e99df504b2"
+    "fileSize": 44683,
+    "fileHash": "sha256-73102800aaa5b2b969685e014bf670bebc7e0d99987707f84bc3d4c86d02598d"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/ThugTV.cs3",
