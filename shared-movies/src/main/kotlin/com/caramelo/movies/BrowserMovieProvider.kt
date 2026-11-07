@@ -124,7 +124,7 @@ internal abstract class BrowserMovieProvider : MainAPI() {
         val page = player(item) ?: return false
         try {
             val media = browserMedia(
-                page, "$mainUrl/", extensionlessHlsPath = extensionlessHlsPath, preservePageResources = true
+                page, "$mainUrl/", extensionlessHlsPath = extensionlessHlsPath, capture = ::captureMediaWithPageResources
             )
             if (media != null) {
                 mediaTracks.publish(newExtractorLink(name, "$name – Browser player", media.url, media.type) {
