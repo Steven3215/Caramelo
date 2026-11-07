@@ -44,7 +44,7 @@ subprojects {
         setRepo(System.getenv("GITHUB_REPOSITORY") ?: "Steven3215/Caramelo")
     }
 
-    val sharedSettings = name in setOf("Sportsbite", "GlobalFreeTV")
+    val sharedSettings = name in setOf("Sportsbite", "GlobalFreeTV", "Teleonline", "TeleLibre")
     android {
         if (sharedSettings) {
             sourceSets.getByName("main").java.srcDir(rootProject.file("shared-settings/src/main/kotlin"))
