@@ -2,6 +2,21 @@
 
 Caramelo extensions for Cloudstream.
 
+## Audio and subtitles
+
+In Cloudstream 4.8.0, Tracks shows video resolutions and displays audio choices when the selected
+stream contains multiple audio tracks. Caramelo keeps HLS master playlists intact and labels
+known audio languages in Sources. Select another entry in Sources when a provider delivers
+a dub as a separate stream.
+
+Caramelo loads available subtitle files with their language and region, including Latin American
+Spanish and Brazilian Portuguese when provided. Embedded subtitles stay in the stream. Availability
+depends on the title, episode and upstream server.
+
+UniqueStream lists the returned language versions together in Sources. SoloLatino v2 checks
+the offered player options for HLS and MP4 and preserves playback request headers. Its anonymous
+embed flow was verified, and Android playback still needs a device check.
+
 ## New sources
 
 **Nekowatch** provides anime home rows, search, AniList-based details, real SUB/DUB episode lists,
@@ -24,7 +39,7 @@ All three new extensions are beta-only (status 3); device playback and settings 
 
 ## Settings for phone, tablet and Android TV
 
-Sportsbite v5 and Global Free TV v3 have grouped settings menus, searchable category/country lists,
+Sportsbite v6 and Global Free TV v4 have grouped settings menus, searchable category/country lists,
 selection counts, 56dp option rows and 52dp bulk controls. Select all/Deselect all change every option in the current list, including options hidden by search. Save commits a draft; Cancel discards it.
 Grouping and sort changes also use Save/Cancel. Country-filter screens include an All countries action.
 Native focusable controls support touch and D-pad navigation; the TV version does not automatically
@@ -62,7 +77,7 @@ DASH players are unsupported. Age-gated categories are omitted. Android device c
 Movies and TV shows from https://www.movy.sx/, including paginated movie/TV/genre rows,
 search (first result page), movie details, seasons, episodes, quality choices and available subtitles.
 Open the extension's settings/gear button to toggle homepage rows and select playback servers.
-Four original-audio servers are enabled by default. Additional original-audio, German, French,
+Defaults include original-audio, English, German, French, Hindi and Spanish servers. Additional original-audio, German, French,
 Hindi and Spanish servers are optional; not every title exists on every server.
 Disabling all servers produces an instruction to enable one. Switch sources or restart after homepage changes.
 
@@ -92,7 +107,7 @@ Offline, region-restricted, or unsupported sources can have no playable links. B
 
 ## Sportsbite
 
-Version 5 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
+Version 6 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
 Sports includes the live/upcoming schedule, all listed sports and an Other Sports row.
 Live TV includes non-sports channels, category and country browsing, search and pagination.
 Matching channel names within the same country share a card and offer alternate servers.

@@ -2,7 +2,7 @@
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/CinemaArmy.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "Cinema Army",
     "internalName": "CinemaArmy",
@@ -16,33 +16,33 @@
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 24163,
-    "fileHash": "sha256-488cc352d9b68c052b55466801786b996d4f6d6b9c190a8362b5e6722cfb8cf0"
+    "fileSize": 40555,
+    "fileHash": "sha256-69810f3228f6a5740edec215fc967cef72d9c5eb81376b1bf6a8dbec59698cf1"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/UniqueStreamAnime.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "UniqueStream Anime",
     "internalName": "UniqueStreamAnime",
     "authors": [
       "Caramelo"
     ],
-    "description": "AnimeStream by UniqueStream: anime series and movies, audio choices and subtitles. Device testing pending. Local playback only.",
+    "description": "Anime series and movies with available audio versions in Sources and regional subtitle languages. Local playback.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Anime",
       "AnimeMovie"
     ],
     "language": "en",
-    "fileSize": 24933,
-    "fileHash": "sha256-e3ee41a86ed74df0084ce232ffdc201904c075c2a3f57b743b55928108b459d5"
+    "fileSize": 41856,
+    "fileHash": "sha256-cbc60af560fc16476cc5d19d93f1d7305ddadeb41ec2a095fb646d433ce17d6c"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Sportsbite.cs3",
     "status": 3,
-    "version": 5,
+    "version": 6,
     "apiVersion": 1,
     "name": "Sportsbite",
     "internalName": "Sportsbite",
@@ -55,13 +55,13 @@
       "Live"
     ],
     "language": "en",
-    "fileSize": 61114,
-    "fileHash": "sha256-0cd9d973e5d86aed522871916a5aca4f42f186b4f2dd6f4a949f9e3aa8d81dff"
+    "fileSize": 77110,
+    "fileHash": "sha256-dfd703f3cada3711fd04fc9f4e4072852ddf6c7976c63314f396c2645d6d20f7"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/GlobalFreeTV.cs3",
     "status": 3,
-    "version": 3,
+    "version": 4,
     "apiVersion": 1,
     "name": "Global Free TV",
     "internalName": "GlobalFreeTV",
@@ -74,33 +74,33 @@
       "Live"
     ],
     "language": "en",
-    "fileSize": 61528,
-    "fileHash": "sha256-64055668f7d6fd232d175db6c0ee6f6684bb6281884860830570c8dc2c53215a"
+    "fileSize": 81990,
+    "fileHash": "sha256-da42980045669032c765e4e547cd2a9e6a54872d582f10688e185bab99ef5f81"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Movy.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "Movy",
     "internalName": "Movy",
     "authors": [
       "Caramelo"
     ],
-    "description": "Movy movies and TV shows, configurable homepage rows and playback servers. Stream availability depends on network/upstream access. Device testing pending.",
+    "description": "Movie and TV catalogs with selectable original and alternate language servers, plus available subtitles. Playback varies by network.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Movie",
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 38778,
-    "fileHash": "sha256-2abd6c0488c2e36909f5311f7f7a8d84e8a557913057d05435d6049f3e77315d"
+    "fileSize": 56132,
+    "fileHash": "sha256-6619ea109421218f3970cb37cb0dcbe0b2218d0a20f67dec2e243f0e3fbc91e6"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Corsflix.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "Corsflix",
     "internalName": "Corsflix",
@@ -114,13 +114,13 @@
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 32350,
-    "fileHash": "sha256-8dcb80d3a14a445ff21be2cdee4748459392c55c5b27b454513c893d053332e2"
+    "fileSize": 48767,
+    "fileHash": "sha256-7718ab01e3bc7b752e231b1b7e2184b8cc3189f5f5ed9f5ef1c4328feb46ea11"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Nekowatch.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "Nekowatch",
     "internalName": "Nekowatch",
@@ -134,13 +134,13 @@
       "AnimeMovie"
     ],
     "language": "en",
-    "fileSize": 23541,
-    "fileHash": "sha256-32d49f02af6aed8d188bce5a5bed10fa3665b8cab983d2393187382547fef9f9"
+    "fileSize": 40262,
+    "fileHash": "sha256-830ac517acf3dd97cf676d7e5db7bae340e1aec258796392023e2f61092d61ab"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/AnimeSuge.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "AnimeSuge",
     "internalName": "AnimeSuge",
@@ -154,13 +154,13 @@
       "AnimeMovie"
     ],
     "language": "en",
-    "fileSize": 29570,
-    "fileHash": "sha256-762ae427ea85c4a4bd9a4b23023286225b6954375480e37a413f3c2130eb3180"
+    "fileSize": 46130,
+    "fileHash": "sha256-ce8c9c21144c16102ed5a46d24a6106b7a1b9e1efe7357c7b4ec7e17f257b65d"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Teleonline.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "Teleonline",
     "internalName": "Teleonline",
@@ -173,13 +173,13 @@
       "Live"
     ],
     "language": "es",
-    "fileSize": 36366,
-    "fileHash": "sha256-1d6e6dc3216183d74a64334b0df63a553914e8e09ed2193b809c65037426ce64"
+    "fileSize": 53048,
+    "fileHash": "sha256-4af85aec2e4c9ec9c6b7cfff4fe9086d01ff03f17fe54621f01b3e470a5a9a4e"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/TeleLibre.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "Tele Libre",
     "internalName": "TeleLibre",
@@ -192,13 +192,13 @@
       "Live"
     ],
     "language": "es",
-    "fileSize": 41868,
-    "fileHash": "sha256-100786ffd8172bca98165635c4fd091ff849079739ab191791f47b34ab4f54d4"
+    "fileSize": 58185,
+    "fileHash": "sha256-5bd5e7fb37cab21e86f8bde9eb1aba61169a38b928a69644f9664a2aa6209741"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/JustAnime.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "JustAnime",
     "internalName": "JustAnime",
@@ -212,13 +212,13 @@
       "AnimeMovie"
     ],
     "language": "en",
-    "fileSize": 23293,
-    "fileHash": "sha256-9f5e360d25e9ed7f04c99bb506d905c59053664911b97fe978eb46d566ab9ce2"
+    "fileSize": 41205,
+    "fileHash": "sha256-09830d1160163e3c497333ec44f8b7cbdcbabe475d02b1b62ba0e56dd4eb3aee"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/ThugTV.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "ThugTV",
     "internalName": "ThugTV",
@@ -232,13 +232,13 @@
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 24842,
-    "fileHash": "sha256-ccf3081834c4e51cb66649f5304e9ddd475bd4cbcbb56463bdb7bf84df605e5c"
+    "fileSize": 41783,
+    "fileHash": "sha256-0836ed75c22101db00573cb8e5a773e9aa750becc1f4ee868837294b3dd08681"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Lightflix.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "Lightflix",
     "internalName": "Lightflix",
@@ -252,13 +252,13 @@
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 25551,
-    "fileHash": "sha256-b292f3987dd8353d3ec6e43c683312d50fe923494f2bfa5021ad3d3c79511062"
+    "fileSize": 40693,
+    "fileHash": "sha256-827dbadd4f2dfed2e563189b0e93dbc57f61098ff04503571ba33500ca8628cc"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Moonflix.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "Moonflix",
     "internalName": "Moonflix",
@@ -272,13 +272,13 @@
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 31362,
-    "fileHash": "sha256-5da59783e0bcd27db3103b799dc950f167bf8968c0f2c466756fb0e4a5251f39"
+    "fileSize": 47790,
+    "fileHash": "sha256-f7c28a6a62be275596c6eeea27542a71b74d92195eb4ac3c86acdfedc34d2572"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Nexa.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "Nexa",
     "internalName": "Nexa",
@@ -292,27 +292,27 @@
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 25802,
-    "fileHash": "sha256-858f2dd0f12a1a1cec1f52d73712429b2c5f70394079328bb43c19062bfa8705"
+    "fileSize": 41100,
+    "fileHash": "sha256-be92730ecc19efed756ee622885bf6de4acd85e56ff7453e83d9686b50e3dcef"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/SoloLatino.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "SoloLatino",
     "internalName": "SoloLatino",
     "authors": [
       "Caramelo"
     ],
-    "description": "Spanish movie and series catalog with episode lists. Anonymous embeds verified locally. Experimental Android browser playback.",
+    "description": "Spanish movie and series catalog. Updated HLS and MP4 browser capture. Android playback unverified.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Movie",
       "TvSeries"
     ],
     "language": "es",
-    "fileSize": 20656,
-    "fileHash": "sha256-c97470afea0c60095b8e5fee8f22c7dfdb8437c307871f04dee460177fdc19f4"
+    "fileSize": 36233,
+    "fileHash": "sha256-e27c1d2f53b0270843ead62b917b27c2c7f07db1bf2cd09a30ee92ecfae581cf"
   }
 ]
