@@ -22,13 +22,14 @@ class DominicanChannelsProvider : MainAPI() {
     override val supportedTypes = setOf(TvType.Live)
     override val mainPage = mainPageOf(
         "/" to "Todos los canales",
-        "/tv/santo-domingo/" to "Santo Domingo",
-        "/tv/santiago/" to "Santiago",
-        "/tv/santiago-y-el-norte/" to "Zona Norte",
-        "/tv/sur-este/" to "Sur y Este",
-        "/tv/online/" to "Online",
+        "/tv/nacionales/" to "Canales nacionales",
+        "/tv/deportes/" to "Deportes",
+        "/tv/beisbol-dominicano/" to "Béisbol dominicano",
+        "/tv/canales-de-musica/" to "Música",
         "/tv/tv-cristiana/" to "TV cristiana",
-        "/tv/usa/" to "Estados Unidos",
+        "/tv/turismo/" to "Turismo",
+        "/tv/emisoras-con-video/" to "Emisoras con video",
+        "/tv/online/" to "Canales online",
     )
 
     private val hosts = setOf("dominicanchannels.com", "www.dominicanchannels.com", "tv.dominicanchannels.com")
@@ -112,7 +113,7 @@ class DominicanChannelsProvider : MainAPI() {
     ): Boolean {
         val page = channelUrl(data) ?: return false
         val document = app.get(page).document
-        val player = document.selectFirst(".videosection") ?: return false
+        val player = document.selectFirst("#videocont, .videosection") ?: return false
         val candidates = playlistUrls(player).map { it to page }.toMutableList()
         if (candidates.isEmpty()) {
             val frames = player.select("iframe").map { it.absUrl("src").ifBlank { it.absUrl("data-src") } }

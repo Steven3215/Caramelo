@@ -1,6 +1,6 @@
 version = 1
 cloudstream {
-    description = "Live Dominican television with regional browsing and channel search."
+    description = "Live Dominican television with category browsing and channel search."
     authors = listOf("Caramelo")
     status = 1
     tvTypes = listOf("Live")
