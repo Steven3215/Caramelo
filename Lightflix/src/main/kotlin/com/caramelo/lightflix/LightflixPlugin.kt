@@ -12,10 +12,10 @@ import kotlinx.coroutines.sync.withLock
 
 @CloudstreamPlugin
 class LightflixPlugin : Plugin() {
-    override fun load(context: Context) { registerMainAPI(LightflixProvider()) }
+    override fun load(context: Context) { registerMainAPI(LightflixProvider(context.applicationContext)) }
 }
 
-internal class LightflixProvider : BrowserMovieProvider() {
+internal class LightflixProvider(context: Context) : BrowserMovieProvider(context) {
     override var name = "Lightflix"
     override var mainUrl = "https://lightflix.app"
     override val mainPage = mainPageOf("/trending/movie/week" to "Trending Movies", "/trending/tv/week" to "Trending TV",
