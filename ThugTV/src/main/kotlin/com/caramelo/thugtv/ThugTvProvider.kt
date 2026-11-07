@@ -33,6 +33,8 @@ class ThugTvProvider : MainAPI() {
         val pages = mutableListOf<List<SearchResponse>>()
         val seen = mutableSetOf<String>()
         var updatedAt = 0L
+        var nextUpstreamPage = 1
+        var exhausted = false
     }
     private val homeRows = mainPage.associate { it.data to HomeRow() }
     private fun JsonNode.string(key: String) = get(key)?.takeIf { it.isTextual }?.asText()?.takeIf { it.isNotBlank() }
@@ -61,17 +63,27 @@ class ThugTvProvider : MainAPI() {
             if (page == 1 && System.currentTimeMillis() - row.updatedAt >= 60_000L) {
                 row.pages.clear()
                 row.seen.clear()
+                row.nextUpstreamPage = 1
+                row.exhausted = false
             }
             val fallback = if (request.data.endsWith("-tv")) "tv" else "movie"
-            while (row.pages.size < page && row.pages.lastOrNull()?.isEmpty() != true) {
-                val next = row.pages.size + 1
-                val items = api("/tmdb/${request.data}?page=$next").mapNotNull { card(it, fallback) }
-                    .filter { row.seen.add(it.url) }
-                row.pages.add(items)
+            var skipped = 0
+            while (row.pages.size < page && !row.exhausted) {
+                val next = row.nextUpstreamPage
+                val upstream = api("/tmdb/${request.data}?page=$next")
+                if (!upstream.isArray) throw ErrorLoadingException("Invalid ThugTV homepage response")
+                row.nextUpstreamPage++
                 if (next == 1) row.updatedAt = System.currentTimeMillis()
+                val items = upstream.mapNotNull { card(it, fallback) }.filter { row.seen.add(it.url) }
+                if (items.isNotEmpty()) {
+                    row.pages.add(items)
+                    skipped = 0
+                } else if (upstream.isEmpty || ++skipped >= 3) {
+                    row.exhausted = true
+                }
             }
             val items = row.pages.getOrNull(page - 1).orEmpty()
-            val hasNext = items.isNotEmpty() && row.pages.getOrNull(page)?.isEmpty() != true
+            val hasNext = items.isNotEmpty() && (page < row.pages.size || !row.exhausted)
             newHomePageResponse(request, items, hasNext)
         }
     }
