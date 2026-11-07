@@ -116,5 +116,24 @@
     "language": "en",
     "fileSize": 38778,
     "fileHash": "sha256-2abd6c0488c2e36909f5311f7f7a8d84e8a557913057d05435d6049f3e77315d"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/0c536ded346d69dbcc715f8f71684580c0095b2a/downloads/DominicanChannels.cs3",
+    "status": 1,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "DominicanChannels",
+    "internalName": "DominicanChannels",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Live Dominican television with category browsing and channel search.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Live"
+    ],
+    "language": "es",
+    "fileSize": 18382,
+    "fileHash": "sha256-d5dcba2b44231508726f9cb67c9e85f564e6841752bb570305ad444f6a7f7724"
   }
 ]
