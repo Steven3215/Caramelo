@@ -158,9 +158,9 @@
     "fileHash": "sha256-ce8c9c21144c16102ed5a46d24a6106b7a1b9e1efe7357c7b4ec7e17f257b65d"
   },
   {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/Teleonline.cs3",
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/53dd6c0dbcfa65c83433f9d7a22254f49d044e77/downloads/Teleonline.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "Teleonline",
     "internalName": "Teleonline",
@@ -173,8 +173,8 @@
       "Live"
     ],
     "language": "es",
-    "fileSize": 53048,
-    "fileHash": "sha256-4af85aec2e4c9ec9c6b7cfff4fe9086d01ff03f17fe54621f01b3e470a5a9a4e"
+    "fileSize": 53591,
+    "fileHash": "sha256-87ee3034faf460f7daf136d97e000ddf9adbbe6281924336d1f30db6f132a10a"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/TeleLibre.cs3",
@@ -196,9 +196,9 @@
     "fileHash": "sha256-5bd5e7fb37cab21e86f8bde9eb1aba61169a38b928a69644f9664a2aa6209741"
   },
   {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/JustAnime.cs3",
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/53dd6c0dbcfa65c83433f9d7a22254f49d044e77/downloads/JustAnime.cs3",
     "status": 3,
-    "version": 3,
+    "version": 4,
     "apiVersion": 1,
     "name": "JustAnime",
     "internalName": "JustAnime",
@@ -212,8 +212,8 @@
       "AnimeMovie"
     ],
     "language": "en",
-    "fileSize": 41205,
-    "fileHash": "sha256-09830d1160163e3c497333ec44f8b7cbdcbabe475d02b1b62ba0e56dd4eb3aee"
+    "fileSize": 41279,
+    "fileHash": "sha256-bf9e1ed4118a9acb0c431286a515f53bccb5aad49e4ffb8dbbae70e99df504b2"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/ThugTV.cs3",
@@ -276,9 +276,9 @@
     "fileHash": "sha256-f7c28a6a62be275596c6eeea27542a71b74d92195eb4ac3c86acdfedc34d2572"
   },
   {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/Nexa.cs3",
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/53dd6c0dbcfa65c83433f9d7a22254f49d044e77/downloads/Nexa.cs3",
     "status": 3,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "Nexa",
     "internalName": "Nexa",
@@ -292,8 +292,8 @@
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 41100,
-    "fileHash": "sha256-be92730ecc19efed756ee622885bf6de4acd85e56ff7453e83d9686b50e3dcef"
+    "fileSize": 41825,
+    "fileHash": "sha256-c9e8a3486ef0948f4ca376de1ae619d2e97fc042e8b11cc7efde780435f4ae7b"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/SoloLatino.cs3",
