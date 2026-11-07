@@ -11,6 +11,7 @@ cat > "$RUNNER_TEMP/rebuild_preference.xml" <<'EOF'
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <map>
   <string name="HAS_DONE_SETUP">true</string>
+  <string name="jsdelivr_proxy_key">true</string>
   <string name="REPOSITORIES_KEY">[{"name":"Caramelo","url":"https://raw.githubusercontent.com/Steven3215/Caramelo/main/repo.json"}]</string>
 </map>
 EOF
@@ -42,5 +43,6 @@ plugins = json.loads(pathlib.Path("plugins.json").read_text())
 missing = [entry["internalName"] for entry in plugins if f'Loaded plugin {entry["internalName"]} successfully' not in log]
 if missing:
     raise SystemExit(f"Failed to verify {len(missing)} extensions: {', '.join(missing)}")
-print(f"Official Cloudstream APK downloaded and loaded all {len(plugins)} extensions.")
+assert "Downloading plugin: https://raw.githubusercontent.com/" in log
+print(f"With GitHub Proxy enabled, the official Cloudstream APK downloaded and loaded all {len(plugins)} extensions.")
 PY
