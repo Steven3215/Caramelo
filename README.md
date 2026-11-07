@@ -31,6 +31,15 @@ Native focusable controls support touch and D-pad navigation; the TV version doe
 focus the search keyboard. Existing preferences are retained. Refresh the source or restart Cloudstream
 after changing homepage rows. Shared selection logic has unit coverage; Android visual/device QA is pending.
 
+## JustAnime and ThugTV
+
+JustAnime provides anime search, browse rows, and episode lists. Available playback links are
+labeled SUB or DUB. Both audio options passed a live HLS media check.
+
+ThugTV provides movie and series catalogs, search, episodes, and native HLS sources.
+A public-domain movie sample played through the HLS media check locally. The hosted runner
+received HTTP 403 from the catalog backend. Both extensions are beta and need device testing.
+
 ## Teleonline and Tele Libre
 
 Teleonline has channel search and selectable category and country rows. Country rows start off.

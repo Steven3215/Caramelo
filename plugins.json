@@ -179,7 +179,7 @@
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/TeleLibre.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "Tele Libre",
     "internalName": "TeleLibre",
@@ -192,7 +192,47 @@
       "Live"
     ],
     "language": "es",
-    "fileSize": 41811,
-    "fileHash": "sha256-f56e158dbf65da91227b5c1bbf2b0eecea7b1b3b4c246a633f6ba6ea69704af0"
+    "fileSize": 41868,
+    "fileHash": "sha256-100786ffd8172bca98165635c4fd091ff849079739ab191791f47b34ab4f54d4"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/JustAnime.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "JustAnime",
+    "internalName": "JustAnime",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Anime home rows, search, real episodes and SUB/DUB HLS. Sample media verified. Device testing pending.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Anime",
+      "AnimeMovie"
+    ],
+    "language": "en",
+    "fileSize": 21473,
+    "fileHash": "sha256-b5996af7410ac8390af6fca97f256e5b9ae40df3a2bf9379edec9f51badaa36c"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/ThugTV.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "ThugTV",
+    "internalName": "ThugTV",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Movie and TV catalog, search and HLS. Local sample media passed. GitHub runner was blocked by HTTP 403. Device testing pending.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "language": "en",
+    "fileSize": 22081,
+    "fileHash": "sha256-cb1976af68217ea535619a8352d9c2ffd768a910426d03d11b3664645a76b286"
   }
 ]
