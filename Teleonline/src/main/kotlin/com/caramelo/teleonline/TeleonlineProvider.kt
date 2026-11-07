@@ -9,6 +9,7 @@ import com.lagradost.cloudstream3.utils.*
 import org.jsoup.Jsoup
 import java.net.URLEncoder
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CancellationException
 
 class TeleonlineProvider internal constructor(private val settings: ChannelRows) : MainAPI() {
     override var name = "Teleonline"
@@ -21,12 +22,37 @@ class TeleonlineProvider internal constructor(private val settings: ChannelRows)
     private val json = ObjectMapper()
     private val cache = ConcurrentHashMap<String, Pair<Long, String>>()
     private suspend fun api(query: String): JsonNode {
-        val cached = cache[query]?.takeIf { System.currentTimeMillis() - it.first < 300000 }?.second
-        val body = cached ?: app.get("$mainUrl/wp-json/wp/v2/posts?$query", timeout = 25).let {
-            if (it.code !in 200..299) throw ErrorLoadingException("Teleonline directory unavailable (HTTP ${it.code})")
-            if (cache.size > 100) cache.clear(); cache[query] = System.currentTimeMillis() to it.text; it.text
+        val cached = cache[query]
+        if (cached != null && System.currentTimeMillis() - cached.first < 300_000L) {
+            return json.readTree(cached.second)
         }
-        return json.readTree(body)
+        var failure: String? = null
+        for (url in listOf(
+            "$mainUrl/wp-json/wp/v2/posts?$query",
+            "$mainUrl/?rest_route=%2Fwp%2Fv2%2Fposts&$query"
+        )) {
+            try {
+                val response = app.get(url, timeout = 15)
+                if (response.code !in 200..299) {
+                    failure = "HTTP ${response.code}"
+                    continue
+                }
+                val posts = json.readTree(response.text)
+                if (!posts.isArray) {
+                    failure = "unexpected response"
+                    continue
+                }
+                if (cache.size > 100) cache.clear()
+                cache[query] = System.currentTimeMillis() to response.text
+                return posts
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                failure = "request failed"
+            }
+        }
+        if (cached != null) return json.readTree(cached.second)
+        throw ErrorLoadingException("Teleonline directory unavailable ($failure)")
     }
     private fun card(node: JsonNode): SearchResponse? {
         if (node.path("categories").any { it.asInt() == 130 }) return null
