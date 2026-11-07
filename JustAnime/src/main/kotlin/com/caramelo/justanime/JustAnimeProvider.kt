@@ -89,14 +89,19 @@ class JustAnimeProvider : MainAPI() {
         val (id, ep) = data.split('/')
         val path = "/watch/$id/episode/$ep"
         val servers = api("$path/servers").path("servers")
+        val audioTypes = listOf("sub", "dub")
+        val serverOrder = listOf("revo", "gigi", "calm", "momo", "onyx", "nami", "zone", "susi")
+        val advertised = audioTypes.filter { audio -> serverOrder.any { servers.path(it).path(audio).asBoolean() } }
+        val verifiedAudio = mutableSetOf<String>()
         val emitted = mutableSetOf<String>()
         val tracks = mutableSetOf<String>()
-        for (server in listOf("revo", "gigi", "calm", "momo", "onyx", "nami", "zone", "susi")) {
+        for (server in serverOrder) {
             val availability = servers.path(server)
-            if (listOf("sub", "dub").none { availability.path(it).asBoolean() }) continue
+            val available = audioTypes.filter { availability.path(it).asBoolean() }
+            if (available.isEmpty() || (emitted.size >= 2 && available.all { it in verifiedAudio })) continue
             try {
                 val bundle = api("$path/$server")
-                for (audio in listOf("sub", "dub")) {
+                for (audio in available) {
                     val group = bundle.path(audio)
                     for (source in group.path("sources")) {
                         val url = source.string("url")?.takeIf { web(it) && it !in emitted } ?: continue
@@ -109,6 +114,7 @@ class JustAnimeProvider : MainAPI() {
                         val response = app.get(url, headers = headers, referer = referer, timeout = 12)
                         if (response.code !in 200..299 || !response.text.trimStart().startsWith("#EXTM3U")) continue
                         emitted.add(url)
+                        verifiedAudio.add(audio)
                         callback(newExtractorLink(name, "$name – $server (${audio.uppercase()})", url, ExtractorLinkType.M3U8) {
                             this.referer = referer
                             this.headers = headers
@@ -121,7 +127,7 @@ class JustAnimeProvider : MainAPI() {
                         subtitleCallback(SubtitleFile(track.string("label") ?: track.string("lang") ?: "Subtitle", url))
                     }
                 }
-                if (emitted.size >= 2) break
+                if (emitted.size >= 2 && advertised.all { it in verifiedAudio }) break
             } catch (error: Exception) { if (error is CancellationException) throw error }
         }
         if (emitted.isEmpty()) throw ErrorLoadingException("No working JustAnime HLS stream was found for this episode")

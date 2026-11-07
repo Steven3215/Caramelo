@@ -1,4 +1,4 @@
-version = 1
+version = 2
 cloudstream {
     description = "ThugTV movies and TV shows with site catalog, search and direct sources."
     authors = listOf("Caramelo")

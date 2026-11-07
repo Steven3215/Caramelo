@@ -125,25 +125,26 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
         }
         return null
     }
-    private suspend fun resolve(stream: JsonNode): Triple<String, String, String>? {
+    private data class VerifiedFeed(val label: String, val url: String, val referer: String)
+
+    private suspend fun resolve(stream: JsonNode): VerifiedFeed? {
         val raw = (stream.text("manifest_url") ?: stream.text("iframe_url") ?: stream.text("embed_url"))
             ?.takeIf { SportsbiteProtocol.webUrl(it) } ?: return null
         val uri = URI(raw)
         val label = stream.text("name") ?: stream.text("label") ?: "Server"
         val direct = stream.text("format")?.lowercase(Locale.ROOT) in setOf("hls", "m3u8") || uri.path.endsWith(".m3u8")
-        val target = if (direct) verifiedPlaylist(raw, mainUrl + "/") else {
-            if (uri.host != URI(mainUrl).host || uri.scheme != "https" || uri.userInfo != null) return null
-            val route = SportsbiteProtocol.playlistRoute(raw, mainUrl)
-            val mapped = route?.let { verifiedPlaylist(it, mainUrl + "/") }
-            mapped ?: run {
-                if (!uri.path.contains("-embed/embed/") && !uri.path.startsWith("/selfhost/")) return null
-                val response = app.get(raw, headers = requestHeaders, referer = mainUrl + "/", timeout = 12)
-                if (response.code !in 200..299) return null
-                val source = SportsbiteProtocol.source(response.text, mainUrl) ?: return null
-                verifiedPlaylist(source, raw)
-            }
-        } ?: return null
-        return Triple(label, target, raw)
+        val siteReferer = "$mainUrl/"
+        if (direct) return verifiedPlaylist(raw, siteReferer)?.let { VerifiedFeed(label, it, siteReferer) }
+        if (uri.host != URI(mainUrl).host || uri.scheme != "https" || uri.userInfo != null) return null
+        val route = SportsbiteProtocol.playlistRoute(raw, mainUrl)
+        if (route != null) {
+            verifiedPlaylist(route, siteReferer)?.let { return VerifiedFeed(label, it, siteReferer) }
+        }
+        if (!uri.path.contains("-embed/embed/") && !uri.path.startsWith("/selfhost/")) return null
+        val response = app.get(raw, headers = requestHeaders, referer = siteReferer, timeout = 12)
+        if (response.code !in 200..299) return null
+        val source = SportsbiteProtocol.source(response.text, mainUrl) ?: return null
+        return verifiedPlaylist(source, raw)?.let { VerifiedFeed(label, it, raw) }
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit): Boolean {
@@ -162,11 +163,12 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
                         null
                     }
                 }
-            } }.awaitAll().filterNotNull().distinctBy { it.second }
+            } }.awaitAll().filterNotNull().distinctBy { it.url }
         }
-        for ((label, target, embed) in resolved) {
-            callback(newExtractorLink(name, "$name – $label", target, ExtractorLinkType.M3U8) {
-                referer = embed
+        for (feed in resolved) {
+            callback(newExtractorLink(name, "$name – ${feed.label}", feed.url, ExtractorLinkType.M3U8) {
+                referer = feed.referer
+                headers = requestHeaders
                 extractorData = "sportsbite-media-v1"
             })
         }
@@ -175,12 +177,15 @@ internal class SportsbiteProvider(private val settings: SportsbiteSettings, priv
     }
     override fun getVideoInterceptor(extractorLink: ExtractorLink): Interceptor? {
         if (extractorLink.extractorData != "sportsbite-media-v1") return null
+        val mediaOrigin = URI(extractorLink.url)
         return Interceptor { chain ->
             val request = chain.request()
             val ownHost = request.url.host == URI(mainUrl).host
             val imagePath = Regex("\\.(png|webp|jpe?g|image)$", RegexOption.IGNORE_CASE).containsMatchIn(request.url.encodedPath)
             val builder = request.newBuilder()
-            if (!ownHost) builder.removeHeader("Referer").removeHeader("Origin")
+            val sameMediaOrigin = request.url.scheme == mediaOrigin.scheme && request.url.host == mediaOrigin.host &&
+                request.url.port == (if (mediaOrigin.port != -1) mediaOrigin.port else if (mediaOrigin.scheme == "https") 443 else 80)
+            if (!ownHost && (!sameMediaOrigin || imagePath)) builder.removeHeader("Referer").removeHeader("Origin")
             if (imagePath) builder.removeHeader("Range")
             val response = chain.proceed(builder.build())
             val body = response.body ?: return@Interceptor response

@@ -8,7 +8,9 @@ import com.lagradost.cloudstream3.utils.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import java.net.URI
 import java.net.URLEncoder
@@ -26,6 +28,13 @@ class ThugTvProvider : MainAPI() {
     private val headers get() = mapOf("Origin" to mainUrl)
     private val json = ObjectMapper()
     private val gate = Semaphore(4)
+    private class HomeRow {
+        val lock = Mutex()
+        val pages = mutableListOf<List<SearchResponse>>()
+        val seen = mutableSetOf<String>()
+        var updatedAt = 0L
+    }
+    private val homeRows = mainPage.associate { it.data to HomeRow() }
     private fun JsonNode.string(key: String) = get(key)?.takeIf { it.isTextual }?.asText()?.takeIf { it.isNotBlank() }
     private fun image(path: String?) = path?.takeIf { it.startsWith('/') && !it.startsWith("//") }?.let { "https://image.tmdb.org/t/p/w780$it" }
     private fun title(item: JsonNode) = item.string("title") ?: item.string("name")
@@ -46,10 +55,25 @@ class ThugTvProvider : MainAPI() {
         }
     }
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        if (page < 1) return newHomePageResponse(request, emptyList(), false)
-        val fallback = if (request.data.endsWith("-tv")) "tv" else "movie"
-        val items = api("/tmdb/${request.data}?page=$page").mapNotNull { card(it, fallback) }.distinctBy { it.url }
-        return newHomePageResponse(request, items, items.isNotEmpty())
+        val row = homeRows[request.data]
+        if (page < 1 || row == null) return newHomePageResponse(request, emptyList(), false)
+        return row.lock.withLock {
+            if (page == 1 && System.currentTimeMillis() - row.updatedAt >= 60_000L) {
+                row.pages.clear()
+                row.seen.clear()
+            }
+            val fallback = if (request.data.endsWith("-tv")) "tv" else "movie"
+            while (row.pages.size < page && row.pages.lastOrNull()?.isEmpty() != true) {
+                val next = row.pages.size + 1
+                val items = api("/tmdb/${request.data}?page=$next").mapNotNull { card(it, fallback) }
+                    .filter { row.seen.add(it.url) }
+                row.pages.add(items)
+                if (next == 1) row.updatedAt = System.currentTimeMillis()
+            }
+            val items = row.pages.getOrNull(page - 1).orEmpty()
+            val hasNext = items.isNotEmpty() && row.pages.getOrNull(page)?.isEmpty() != true
+            newHomePageResponse(request, items, hasNext)
+        }
     }
     override suspend fun search(query: String): List<SearchResponse> = if (query.isBlank()) emptyList() else
         api("/tmdb/search?q=" + URLEncoder.encode(query.trim(), "UTF-8")).mapNotNull { card(it, null) }.distinctBy { it.url }

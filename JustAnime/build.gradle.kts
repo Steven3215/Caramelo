@@ -1,4 +1,4 @@
-version = 1
+version = 2
 cloudstream {
     description = "JustAnime catalog, real episode lists, SUB and DUB streams, and available subtitles."
     authors = listOf("Caramelo")
