@@ -196,46 +196,6 @@
     "fileHash": "sha256-a3bff473190293cbddee5f9e0e6df3bdc6febac3b2c6be36fb88453996e9a53a"
   },
   {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/d8dfe686f77a4541f5d9baef555c3e24b174b800/downloads/JustAnime.cs3",
-    "status": 3,
-    "version": 5,
-    "apiVersion": 1,
-    "name": "JustAnime",
-    "internalName": "JustAnime",
-    "authors": [
-      "Caramelo"
-    ],
-    "description": "Anime browse rows, search, episode lists and SUB/DUB HLS. Continues checking for each advertised audio option.",
-    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
-    "tvTypes": [
-      "Anime",
-      "AnimeMovie"
-    ],
-    "language": "en",
-    "fileSize": 44683,
-    "fileHash": "sha256-73102800aaa5b2b969685e014bf670bebc7e0d99987707f84bc3d4c86d02598d"
-  },
-  {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/ThugTV.cs3",
-    "status": 3,
-    "version": 3,
-    "apiVersion": 1,
-    "name": "ThugTV",
-    "internalName": "ThugTV",
-    "authors": [
-      "Caramelo"
-    ],
-    "description": "Movie and TV catalog with homepage pagination that skips repeated titles. HLS availability varies by network.",
-    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
-    "tvTypes": [
-      "Movie",
-      "TvSeries"
-    ],
-    "language": "en",
-    "fileSize": 41783,
-    "fileHash": "sha256-0836ed75c22101db00573cb8e5a773e9aa750becc1f4ee868837294b3dd08681"
-  },
-  {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/a558912a2187dfe5370a292eab1f7709cf157c27/downloads/Lightflix.cs3",
     "status": 3,
     "version": 3,
@@ -254,46 +214,6 @@
     "language": "en",
     "fileSize": 48176,
     "fileHash": "sha256-feac2b15b8edccd5485058e95ca8cd64871301ebd1c0f3dfc327a51abe5581f7"
-  },
-  {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/Moonflix.cs3",
-    "status": 3,
-    "version": 2,
-    "apiVersion": 1,
-    "name": "Moonflix",
-    "internalName": "Moonflix",
-    "authors": [
-      "Caramelo"
-    ],
-    "description": "Movies and series with direct HLS playback where available. A direct media sample passed. Device testing pending.",
-    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
-    "tvTypes": [
-      "Movie",
-      "TvSeries"
-    ],
-    "language": "en",
-    "fileSize": 47790,
-    "fileHash": "sha256-f7c28a6a62be275596c6eeea27542a71b74d92195eb4ac3c86acdfedc34d2572"
-  },
-  {
-    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/53dd6c0dbcfa65c83433f9d7a22254f49d044e77/downloads/Nexa.cs3",
-    "status": 3,
-    "version": 3,
-    "apiVersion": 1,
-    "name": "Nexa",
-    "internalName": "Nexa",
-    "authors": [
-      "Caramelo"
-    ],
-    "description": "Movie and series catalog, search and episodes. Experimental Android browser playback.",
-    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
-    "tvTypes": [
-      "Movie",
-      "TvSeries"
-    ],
-    "language": "en",
-    "fileSize": 41825,
-    "fileHash": "sha256-c9e8a3486ef0948f4ca376de1ae619d2e97fc042e8b11cc7efde780435f4ae7b"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/20f61b0e441553b1d6aac6b591a382aa2fb483e0/downloads/SoloLatino.cs3",

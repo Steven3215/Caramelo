@@ -46,22 +46,11 @@ Native focusable controls support touch and D-pad navigation; the TV version doe
 focus the search keyboard. Existing preferences are retained. Refresh the source or restart Cloudstream
 after changing homepage rows. Shared selection logic has unit coverage; Android visual/device QA is pending.
 
-## Lightflix, Moonflix, Nexa and SoloLatino
+## Lightflix and SoloLatino
 
-All four providers include movie and series catalogs, search and episode lists.
-Moonflix resolves direct HLS links and handles MPEG-TS segments packaged in PNG chunks.
-A sample passed locally and in one hosted run. Direct source availability varies.
-Lightflix and Nexa have verified catalogs. SoloLatino resolved anonymous player embeds locally.
-These three use experimental Android WebView playback. Device playback remains unverified.
-
-## JustAnime and ThugTV
-
-JustAnime provides anime search, browse rows, and episode lists. Available playback links are
-labeled SUB or DUB. Server selection keeps checking for each advertised audio option until it finds a working link. Both audio options passed a live HLS media check.
-
-ThugTV provides movie and series catalogs, search, episodes, and native HLS sources. Homepage pagination skips repeated titles and continues when later pages offer new ones.
-A public-domain movie sample played through the HLS media check locally. The hosted runner
-received HTTP 403 from the catalog backend. Both extensions are beta and need device testing.
+Both providers include movie and series catalogs, search and episode lists.
+Lightflix v3 rendered video for a public-domain sample in Cloudstream 4.8.0 on an Android 14 emulator.
+SoloLatino resolves anonymous player pages. Playback depends on the upstream player.
 
 ## Teleonline and Tele Libre
 
