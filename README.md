@@ -2,25 +2,13 @@
 
 Caramelo extensions for Cloudstream.
 
-## New sources
-
-**Nekowatch** provides anime home rows, search, AniList-based details, real SUB/DUB episode lists,
-signed HLS/file sources and available subtitles through the site's anonymous API. Home rows and
-search use the site's returned lists rather than inventing episode availability. Anime, episode and
-audio identities are checked before accepting playback metadata. Provider availability varies.
-
-**AnimeSuge** provides paginated listings, search, anime details, SUB/DUB episodes and captions.
-The current supported player is MegaPlay. Its public metadata transport is decoded using the
-normal player format, and image-wrapped MPEG-TS segments use a local interceptor.
-Casting is unsupported. Other player hosts may not resolve. No account or video DRM keys are stored.
+## Corsflix
 
 **Corsflix** provides movies/TV, search, details, seasons and episodes using its own catalog API.
 Homepage and server settings are included. The listed 2Embed → StreamWish player chain is parsed,
 with an Android WebView fallback for the site's Rive embed. Both routes validate the playlist with the playback headers. Catalog/embed metadata checks pass,
 but direct player CDN requests returned HTTP403 in manual testing. Full Android playback is unverified;
 this source remains beta and may have no working streams depending on the upstream player.
-
-All three new extensions are beta-only (status 3); device playback and settings testing remain pending.
 
 ## Settings for phone, tablet and Android TV
 
@@ -30,32 +18,6 @@ Grouping and sort changes also use Save/Cancel. Country-filter screens include a
 Native focusable controls support touch and D-pad navigation; the TV version does not automatically
 focus the search keyboard. Existing preferences are retained. Refresh the source or restart Cloudstream
 after changing homepage rows. Shared selection logic has unit coverage; Android visual/device QA is pending.
-
-## Lightflix, Moonflix, Nexa and SoloLatino
-
-All four providers include movie and series catalogs, search and episode lists.
-Moonflix resolves direct HLS links and handles MPEG-TS segments packaged in PNG chunks.
-A sample passed locally and in one hosted run. Direct source availability varies.
-Lightflix and Nexa have verified catalogs. SoloLatino resolved anonymous player embeds locally.
-These three use experimental Android WebView playback. Device playback remains unverified.
-
-## JustAnime and ThugTV
-
-JustAnime provides anime search, browse rows, and episode lists. Available playback links are
-labeled SUB or DUB. Server selection keeps checking for each advertised audio option until it finds a working link. Both audio options passed a live HLS media check.
-
-ThugTV provides movie and series catalogs, search, episodes, and native HLS sources. Homepage pagination skips repeated titles and continues when later pages offer new ones.
-A public-domain movie sample played through the HLS media check locally. The hosted runner
-received HTTP 403 from the catalog backend. Both extensions are beta and need device testing.
-
-## Teleonline and Tele Libre
-
-Teleonline has channel search and selectable category and country rows. Country rows start off.
-Tele Libre has searchable categories. It uses tele-libre.top as a fallback for the matching directory.
-Both settings screens include Select all, Deselect all, Save and Cancel.
-Canal 24 Horas passed a public HLS media check through both providers. Some Teleonline streams
-are region restricted. Tele Libre supports direct HLS and the public RTVE embed path. Encrypted
-DASH players are unsupported. Age-gated categories are omitted. Android device checks are pending.
 
 ## Movy
 
@@ -178,7 +140,7 @@ For local builds, first check out the public build plugin at
 Local prerequisites: Java 17, Android SDK 35 and Gradle 8.12 (no wrapper included).
 
 ```text
-gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest Nekowatch:testDebugUnitTest AnimeSuge:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make Nekowatch:make AnimeSuge:make
+gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make
 python3 tools/smoke_cinema.py
 python3 tools/smoke_unique.py
 python3 tools/smoke_sportsbite.py
