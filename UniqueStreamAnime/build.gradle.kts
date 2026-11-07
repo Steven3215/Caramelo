@@ -1,4 +1,4 @@
-version = 2
+version = 1
 
 cloudstream {
     description = "AnimeStream by UniqueStream: anime series and movies, audio choices and subtitles. Device testing pending."

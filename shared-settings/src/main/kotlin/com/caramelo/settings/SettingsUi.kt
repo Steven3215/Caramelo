@@ -85,11 +85,11 @@ internal object SettingsUi {
             updateCount()
         }
         fun bulk(value: Boolean) {
-            model.setVisible("", value)
+            model.setVisible(search.text.toString(), value)
             shown.forEachIndexed { i, item -> list.setItemChecked(i, model.selected(item.id)) }; updateCount()
         }
-        tools.addView(button(context, "Select all") { bulk(true) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        tools.addView(button(context, "Deselect all") { bulk(false) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        tools.addView(button(context, "Select shown") { bulk(true) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        tools.addView(button(context, "Clear shown") { bulk(false) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         list.setOnItemClickListener { _, _, position, _ -> shown.getOrNull(position)?.let { model.set(it.id, list.isItemChecked(position)); updateCount() } }
         search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

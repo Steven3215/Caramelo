@@ -1,4 +1,4 @@
-version = 3
+version = 1
 cloudstream {
     description = "Corsflix movies and TV shows, configurable homepage rows and third-party embed servers. Device testing pending."
     authors = listOf("Caramelo")

@@ -29,8 +29,7 @@ internal object MovyProtocol {
         "dallas" to "Dallas · Original audio", "munich" to "Munich · German", "berlin" to "Berlin · German",
         "paris" to "Paris · French", "delhi" to "Delhi · Hindi", "cancun" to "Cancun · Spanish"
     )
-    val audioLanguages = mapOf("austin" to "en", "munich" to "de", "berlin" to "de", "paris" to "fr", "delhi" to "hi", "cancun" to "es")
-    val defaultServers = setOf("miami", "boise", "seattle", "chicago", "austin", "munich", "paris", "delhi", "cancun")
+    val defaultServers = setOf("miami", "boise", "seattle", "chicago")
     fun encode(value: String) = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
     fun webUrl(value: String?): Boolean = runCatching {
         val u = URI(value ?: return false)

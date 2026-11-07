@@ -1,6 +1,5 @@
 package com.steven3215.uniquestreamanime
 
-import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -140,7 +139,6 @@ class UniqueStreamAnimeProvider : MainAPI() {
 
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit): Boolean {
-        val mediaTracks = MediaTracks(subtitleCallback)
         // Cast receivers cannot run this provider's HLS key-response interceptor.
         if (isCasting) return false
         val item = UniqueStreamProtocol.item(data, mainUrl)
@@ -155,24 +153,25 @@ class UniqueStreamAnimeProvider : MainAPI() {
             return false
         val primary = media.get("hls")?.takeUnless { it.isNull }
         val versions = listOfNotNull(primary) + media.get("versions")?.items("hls").orEmpty()
-        // The endpoint returns independently encoded language versions of this episode.
-        // Keep the requested language first and offer the other versions in Sources.
-        val selection = versions.sortedByDescending { it.text("locale") == requested }
+        val selection = if (item.audio == "all") versions else {
+            versions.filter { it.text("locale") == requested }
+        }
         val seen = mutableSetOf<String>()
+        val subtitles = mutableSetOf<String>()
         for (version in selection) {
             val playlist = version.text("playlist")?.takeIf { UniqueStreamProtocol.isWebUrl(it) } ?: continue
             val mediaId = UniqueStreamProtocol.mediaId(playlist, media.text("media_id")) ?: continue
             if (!seen.add(playlist)) continue
-            val locale = version.text("locale")
-            mediaTracks.publish(newExtractorLink(name, name, playlist, ExtractorLinkType.M3U8) {
+            val locale = version.text("locale") ?: requested
+            callback(newExtractorLink(name, "$name [$locale]", playlist, ExtractorLinkType.M3U8) {
                 referer = "$mainUrl/"
                 this.headers = mapOf("Referer" to "$mainUrl/", "Origin" to mainUrl, "x-am-media-id" to mediaId)
                 extractorData = mediaId
-            }, callback, audio = locale, inspect = true)
-        }
-        for (version in versions) {
-            mediaTracks.sidecars(version.items("subtitles"), version.text("playlist") ?: "$mainUrl/",
-                mapOf("Referer" to "$mainUrl/", "Origin" to mainUrl))
+            })
+            for (subtitle in version.items("subtitles")) {
+                val url = subtitle.text("url")?.takeIf { UniqueStreamProtocol.isWebUrl(it) } ?: continue
+                if (subtitles.add(url)) subtitleCallback(SubtitleFile(subtitle.text("language") ?: "en", url))
+            }
         }
         return seen.isNotEmpty()
     }

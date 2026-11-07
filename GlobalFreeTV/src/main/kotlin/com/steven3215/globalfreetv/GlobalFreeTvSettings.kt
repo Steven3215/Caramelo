@@ -32,7 +32,7 @@ internal class GlobalFreeTvSettings(context: Context) {
         Toast.makeText(context, "Saved. Switch sources or restart Cloudstream to refresh homepage rows.", Toast.LENGTH_LONG).show()
     }
     private fun rows(context: Context, title: String, values: List<Pair<String, String>>, refresh: () -> Unit) {
-        SettingsUi.select(context, title, "Select all and Deselect all affect every row, including hidden search results. Tap Save to apply. Row switches do not remove channels from search.",
+        SettingsUi.select(context, title, "Choose the rows shown on your homepage. Row switches do not remove channels from search.",
             values.map { SelectionItem(it.first, it.second) }, values.filter { enabled(it.first) }.map { it.first }.toSet(), { selected ->
                 val hidden = prefs.getStringSet("hidden", emptySet()).orEmpty().toMutableSet()
                 values.forEach { if (it.first in selected) hidden.remove(it.first) else hidden.add(it.first) }
@@ -42,7 +42,7 @@ internal class GlobalFreeTvSettings(context: Context) {
     private fun countryFilter(context: Context, refresh: () -> Unit) {
         val values = countries()
         val selected = if (filtering()) selectedCountries() else values.map { it.id }.toSet()
-        SettingsUi.select(context, "Country filter", "Applies to all rows and search. Bulk buttons affect every country. No selection shows no channels. All countries removes the filter.",
+        SettingsUi.select(context, "Country filter", "Applies to all rows and search. No selection shows no channels. All countries removes the filter.",
             values.map { SelectionItem(it.id, it.label) }, selected, { chosen ->
                 prefs.edit().putBoolean("filter_countries", true).putStringSet("allowed_countries", chosen).apply(); refresh(); saved(context)
             }, { prefs.edit().putBoolean("filter_countries", false).apply(); refresh(); saved(context) })

@@ -1,6 +1,5 @@
 package com.caramelo.animesuge
 
-import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
@@ -68,7 +67,6 @@ class AnimeSugeProvider : MainAPI() {
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit): Boolean {
-        val mediaTracks = MediaTracks(subtitleCallback)
         if (isCasting) return false
         val input = json.readTree(data)
         val url = AnimeSugeProtocol.animeUrl(input.text("url") ?: return false)
@@ -81,6 +79,7 @@ class AnimeSugeProvider : MainAPI() {
             .filter { it.attr("data-type") == audio || (audio == "sub" && it.attr("data-type") == "softsub") }
             .flatMap { it.select("[data-link-id]") }.take(6)
         val links = linkedSetOf<String>()
+        val subtitles = linkedSetOf<String>()
         for (server in elements) try {
             val response = json.readTree(app.get("$mainUrl/ajax/server?get=${AnimeSugeProtocol.encode(server.attr("data-link-id"))}", headers = headers, referer = url).text)
             val embed = response.get("result")?.text("url")?.takeIf { AnimeSugeProtocol.megaPlay(it) } ?: continue
@@ -93,12 +92,14 @@ class AnimeSugeProvider : MainAPI() {
             if (target in links) continue
             val playlist = app.get(target, headers = headers, referer = "https://megaplay.buzz/", timeout = 15)
             if (playlist.code !in 200..299 || !playlist.text.trimStart().startsWith("#EXTM3U")) continue
-            mediaTracks.sidecars(bundle.items("tracks") + bundle.items("subtitles"), embed,
-                headers + ("Referer" to embed))
+            for (track in bundle.items("tracks")) {
+                val sub = track.text("file")?.takeIf { AnimeSugeProtocol.webUrl(it) } ?: continue
+                if (track.text("kind") == "captions" && subtitles.add(sub)) subtitleCallback(SubtitleFile(track.text("label") ?: "Unknown", sub))
+            }
             links.add(target)
-            mediaTracks.publish(newExtractorLink(name, "$name – ${server.text()}", target, ExtractorLinkType.M3U8) {
+            callback(newExtractorLink(name, "$name – ${server.text()} (${audio.uppercase()})", target, ExtractorLinkType.M3U8) {
                 referer = "https://megaplay.buzz/"; extractorData = "animesuge-transport-v1"
-            }, callback, playlist.text, playlist.url, audio = if (audio == "dub") "Dubbed" else "Original")
+            })
         } catch (error: Exception) { if (error is CancellationException) throw error }
         if (links.isEmpty()) throw ErrorLoadingException("No working AnimeSuge ${audio.uppercase()} stream is available for this episode")
         return true

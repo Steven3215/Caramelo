@@ -13,16 +13,7 @@ on:
       - 'Corsflix/**'
       - 'Nekowatch/**'
       - 'AnimeSuge/**'
-      - 'Teleonline/**'
-      - 'TeleLibre/**'
-      - 'Lightflix/**'
-      - 'SoloLatino/**'
-      - 'tools/smoke_sololatino.py'
-      - 'shared-movies/**'
-      - 'tools/smoke_movie_catalogs.py'
-      - 'tools/smoke_teletv.py'
       - 'shared-settings/**'
-      - 'shared-tracks/**'
       - '*.gradle.kts'
       - 'gradle.properties'
       - '.github/workflows/build.yml'
@@ -72,15 +63,6 @@ jobs:
       - name: Live AnimeSuge API and HLS smoke test
         continue-on-error: true
         run: python3 tools/smoke_animesuge.py
-      - name: Live Teleonline and Tele Libre directory and broadcaster smoke test
-        continue-on-error: true
-        run: python3 tools/smoke_teletv.py
-      - name: Live Lightflix catalog check
-        continue-on-error: true
-        run: python3 tools/smoke_movie_catalogs.py
-      - name: Live SoloLatino catalog and anonymous embed check
-        continue-on-error: true
-        run: python3 tools/smoke_sololatino.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -93,7 +75,7 @@ jobs:
         with:
           gradle-version: '8.12'
       - name: Unit tests and extension build
-        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest Nekowatch:testDebugUnitTest AnimeSuge:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make Nekowatch:make AnimeSuge:make Teleonline:testDebugUnitTest TeleLibre:testDebugUnitTest Teleonline:make TeleLibre:make Lightflix:make SoloLatino:make --stacktrace
+        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest Nekowatch:testDebugUnitTest AnimeSuge:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make Nekowatch:make AnimeSuge:make --stacktrace
       - name: Save compiled extensions
         uses: actions/upload-artifact@v4
         with:

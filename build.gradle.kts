@@ -44,12 +44,8 @@ subprojects {
         setRepo(System.getenv("GITHUB_REPOSITORY") ?: "Steven3215/Caramelo")
     }
 
-    val sharedSettings = name in setOf("Sportsbite", "GlobalFreeTV", "Teleonline", "TeleLibre")
-    val sharedMovies = name == "Lightflix"
+    val sharedSettings = name in setOf("Sportsbite", "GlobalFreeTV")
     android {
-        sourceSets.getByName("main").java.srcDir(rootProject.file("shared-tracks/src/main/kotlin"))
-        if (project.name == "CinemaArmy") sourceSets.getByName("test").java.srcDir(rootProject.file("shared-tracks/src/test/kotlin"))
-        if (sharedMovies) sourceSets.getByName("main").java.srcDir(rootProject.file("shared-movies/src/main/kotlin"))
         if (sharedSettings) {
             sourceSets.getByName("main").java.srcDir(rootProject.file("shared-settings/src/main/kotlin"))
             sourceSets.getByName("test").java.srcDir(rootProject.file("shared-settings/src/test/kotlin"))

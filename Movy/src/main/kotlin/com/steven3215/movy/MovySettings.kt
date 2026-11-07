@@ -25,7 +25,7 @@ internal class MovySettings(context: Context) {
                 0 -> select(context, false)
                 1 -> select(context, true)
                 2 -> AlertDialog.Builder(context).setTitle("Reset Movy settings?")
-                    .setMessage("Restore all homepage rows and the default original and alternate-language servers.")
+                    .setMessage("Restore all homepage rows and the four default original-audio servers.")
                     .setPositiveButton("Reset") { _, _ -> prefs.edit().clear().apply(); saved(context) }.setNegativeButton("Cancel", null).show()
             }
         }.setNegativeButton("Close", null).show()

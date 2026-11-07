@@ -1,6 +1,5 @@
 package com.steven3215.cinemaarmy
 
-import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -126,7 +125,6 @@ class CinemaArmyProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val mediaTracks = MediaTracks(subtitleCallback)
         val item = CinemaProtocol.item(data, mainUrl)
         val path = item.streamPath()
         val streams = coroutineScope {
@@ -150,16 +148,16 @@ class CinemaArmyProvider : MainAPI() {
         val seen = mutableSetOf<String>()
         for ((index, stream) in streams) {
             if (!seen.add(stream)) continue
-            mediaTracks.publish(newExtractorLink(name, "$name Server ${index + 1}", stream, ExtractorLinkType.M3U8) {
+            callback(newExtractorLink(name, "$name Server ${index + 1}", stream, ExtractorLinkType.M3U8) {
                 referer = "$mainUrl/"
                 this.headers = mapOf("Referer" to "$mainUrl/", "Origin" to mainUrl)
-            }, callback, inspect = true)
+            })
         }
-        if (seen.isNotEmpty()) loadSubtitles(item, mediaTracks)
+        if (seen.isNotEmpty()) loadSubtitles(item, subtitleCallback)
         return seen.isNotEmpty()
     }
 
-    private suspend fun loadSubtitles(item: CinemaItem, mediaTracks: MediaTracks) {
+    private suspend fun loadSubtitles(item: CinemaItem, callback: (SubtitleFile) -> Unit) {
         try {
             val response = app.get("https://rezesubs.com/data/subs/${item.streamPath()}", headers = headers, timeout = 8)
             if (response.code !in 200..299) return
@@ -170,7 +168,14 @@ class CinemaArmyProvider : MainAPI() {
                 body.get("data")?.isArray == true -> body.get("data")
                 else -> return
             }
-            mediaTracks.sidecars(list, "https://rezesubs.com/", mapOf("Referer" to "$mainUrl/", "Origin" to mainUrl))
+            val seen = mutableSetOf<String>()
+            for (subtitle in list.take(40)) {
+                val rawUrl = listOf("url", "download_url", "file_url", "link").firstNotNullOfOrNull { subtitle.text(it) } ?: continue
+                val url = if (rawUrl.startsWith("/")) "https://rezesubs.com$rawUrl" else rawUrl
+                if ((!url.startsWith("https://") && !url.startsWith("http://")) || !seen.add(url)) continue
+                val language = listOf("language", "lang", "language_code").firstNotNullOfOrNull { subtitle.text(it) } ?: "en"
+                callback(SubtitleFile(language, url))
+            }
         } catch (error: Exception) {
             if (error is CancellationException) throw error
             // Subtitles are optional and must not fail video playback.

@@ -1,4 +1,4 @@
-version = 2
+version = 1
 cloudstream {
     description = "AnimeSuge anime catalog, SUB/DUB episodes and MegaPlay HLS with subtitles. Local playback; device testing pending."
     authors = listOf("Caramelo")

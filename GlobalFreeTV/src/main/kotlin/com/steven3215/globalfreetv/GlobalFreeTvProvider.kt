@@ -1,6 +1,5 @@
 package com.steven3215.globalfreetv
 
-import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -157,7 +156,6 @@ internal class GlobalFreeTvProvider(private val settings: GlobalFreeTvSettings) 
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit): Boolean {
-        val mediaTracks = MediaTracks(subtitleCallback)
         val id = GlobalFreeTvProtocol.channelId(data)
         val streams = api("/channels/${GlobalFreeTvProtocol.encode(id)}/streams", cache = false).items("data")
             .filter { GlobalFreeTvProtocol.webUrl(it.text("url")) }.distinctBy { it.text("url") }.sortedByDescending { it.get("id")?.asLong() ?: 0 }.take(24)
@@ -173,10 +171,10 @@ internal class GlobalFreeTvProvider(private val settings: GlobalFreeTvSettings) 
                         val streamHeaders = userAgent?.let { mapOf("User-Agent" to it) }.orEmpty()
                         val response = app.get(url, headers = streamHeaders, referer = referer, timeout = 12)
                         if (response.code in 200..299 && GlobalFreeTvProtocol.playlist(response.text)) {
-                            mediaTracks.publish(newExtractorLink(name, "$name – Source ${index + 1}" + (stream.text("resolution")?.let { " · $it" } ?: ""), url, ExtractorLinkType.M3U8) {
+                            callback(newExtractorLink(name, "$name – Source ${index + 1}" + (stream.text("resolution")?.let { " · $it" } ?: ""), url, ExtractorLinkType.M3U8) {
                                 this.referer = referer
                                 this.headers = streamHeaders
-                            }, callback, response.text, response.url, audio = stream.text("language"))
+                            })
                             count.incrementAndGet()
                         }
                     } catch (error: Exception) { if (error is CancellationException) throw error }

@@ -1,6 +1,5 @@
 package com.caramelo.nekowatch
 
-import com.caramelo.tracks.MediaTracks
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
@@ -82,7 +81,6 @@ class NekowatchProvider : MainAPI() {
     }
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit): Boolean {
-        val mediaTracks = MediaTracks(subtitleCallback)
         val input = json.readTree(data)
         val id = input.get("id")?.asInt() ?: return false
         val number = input.get("episode")?.asInt() ?: return false
@@ -97,26 +95,25 @@ class NekowatchProvider : MainAPI() {
                 result.takeIf { NekowatchProtocol.identity(it, id, number, audio) }
             } catch (error: Exception) { if (error is CancellationException) throw error; null }
         } }.awaitAll().filterNotNull() }
-        val subtitleHeaders = headers + ("Referer" to "$mainUrl/")
-        for (result in responses) {
-            mediaTracks.sidecars(result.items("subtitles") + result.items("tracks"), "$mainUrl/", subtitleHeaders)
+        val subtitles = responses.flatMap { it.items("subtitles") }.distinctBy { it.text("url") }
+        for (sub in subtitles) NekowatchProtocol.absolute(sub.text("url"))?.let {
+            subtitleCallback(SubtitleFile(sub.text("label") ?: sub.text("lang") ?: "Unknown", it))
         }
         var count = 0
         for (stream in responses.flatMap { it.items("streams") }.distinctBy { it.text("url") }) {
             val kind = stream.text("kind")
             if (kind !in setOf("hls", "file")) continue
             val url = NekowatchProtocol.absolute(stream.text("url")) ?: continue
-            val playlist = if (kind == "hls") {
+            if (kind == "hls") {
                 try {
                     val result = app.get(url, headers = headers, referer = "$mainUrl/", timeout = 15)
                     if (result.code !in 200..299 || !result.text.trimStart().startsWith("#EXTM3U")) continue
-                    result
                 } catch (error: Exception) { if (error is CancellationException) throw error; continue }
-            } else null
-            mediaTracks.publish(newExtractorLink(name, "$name – ${stream.text("label") ?: "Server"}", url,
+            }
+            callback(newExtractorLink(name, "$name – ${stream.text("label") ?: "Server"} (${audio.uppercase()})", url,
                 if (kind == "hls") ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO) {
                 referer = "$mainUrl/"; this.headers = this@NekowatchProvider.headers; quality = getQualityFromName(stream.text("quality"))
-            }, callback, playlist?.text, playlist?.url ?: url, audio = if (audio == "dub") "Dubbed" else "Original"); count++
+            }); count++
         }
         if (count == 0) throw ErrorLoadingException("No working Nekowatch ${audio.uppercase()} stream is available for this episode")
         return true

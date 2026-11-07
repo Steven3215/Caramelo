@@ -2,21 +2,6 @@
 
 Caramelo extensions for Cloudstream.
 
-## Audio and subtitles
-
-In Cloudstream 4.8.0, Tracks shows video resolutions and displays audio choices when the selected
-stream contains multiple audio tracks. Caramelo keeps HLS master playlists intact and labels
-known audio languages in Sources. Select another entry in Sources when a provider delivers
-a dub as a separate stream.
-
-Caramelo loads available subtitle files with their language and region, including Latin American
-Spanish and Brazilian Portuguese when provided. Embedded subtitles stay in the stream. Availability
-depends on the title, episode and upstream server.
-
-UniqueStream lists the returned language versions together in Sources. SoloLatino v2 checks
-the offered player options for HLS and MP4 and preserves playback request headers. Its anonymous
-embed flow was verified, and Android playback still needs a device check.
-
 ## New sources
 
 **Nekowatch** provides anime home rows, search, AniList-based details, real SUB/DUB episode lists,
@@ -31,7 +16,7 @@ Casting is unsupported. Other player hosts may not resolve. No account or video 
 
 **Corsflix** provides movies/TV, search, details, seasons and episodes using its own catalog API.
 Homepage and server settings are included. The listed 2Embed → StreamWish player chain is parsed,
-with an Android WebView fallback for the site's Rive embed. Both routes validate the playlist with the playback headers. Catalog/embed metadata checks pass,
+with an Android WebView fallback for the site's Rive embed. Catalog/embed metadata checks pass,
 but direct player CDN requests returned HTTP403 in manual testing. Full Android playback is unverified;
 this source remains beta and may have no working streams depending on the upstream player.
 
@@ -39,34 +24,20 @@ All three new extensions are beta-only (status 3); device playback and settings 
 
 ## Settings for phone, tablet and Android TV
 
-Sportsbite v6 and Global Free TV v4 have grouped settings menus, searchable category/country lists,
-selection counts, 56dp option rows and 52dp bulk controls. Select all/Deselect all change every option in the current list, including options hidden by search. Save commits a draft; Cancel discards it.
+Sportsbite v3 and Global Free TV v2 have grouped settings menus, searchable category/country lists,
+selection counts, 56dp option rows and 52dp bulk controls. Select shown/Clear shown only change
+the filtered results, while preserving hidden selections. Save commits a draft; Cancel discards it.
 Grouping and sort changes also use Save/Cancel. Country-filter screens include an All countries action.
 Native focusable controls support touch and D-pad navigation; the TV version does not automatically
 focus the search keyboard. Existing preferences are retained. Refresh the source or restart Cloudstream
 after changing homepage rows. Shared selection logic has unit coverage; Android visual/device QA is pending.
-
-## Lightflix and SoloLatino
-
-Both providers include movie and series catalogs, search and episode lists.
-Lightflix v3 rendered video for a public-domain sample in Cloudstream 4.8.0 on an Android 14 emulator.
-SoloLatino resolves anonymous player pages. Playback depends on the upstream player.
-
-## Teleonline and Tele Libre
-
-Teleonline has channel search and selectable category and country rows. Country rows start off.
-Tele Libre has searchable categories. It uses tele-libre.top as a fallback for the matching directory.
-Both settings screens include Select all, Deselect all, Save and Cancel.
-Canal 24 Horas passed a public HLS media check through both providers. Some Teleonline streams
-are region restricted. Tele Libre supports direct HLS and the public RTVE embed path. Encrypted
-DASH players are unsupported. Age-gated categories are omitted. Android device checks are pending.
 
 ## Movy
 
 Movies and TV shows from https://www.movy.sx/, including paginated movie/TV/genre rows,
 search (first result page), movie details, seasons, episodes, quality choices and available subtitles.
 Open the extension's settings/gear button to toggle homepage rows and select playback servers.
-Defaults include original-audio, English, German, French, Hindi and Spanish servers. Additional original-audio, German, French,
+Four original-audio servers are enabled by default. Additional original-audio, German, French,
 Hindi and Spanish servers are optional; not every title exists on every server.
 Disabling all servers produces an instruction to enable one. Switch sources or restart after homepage changes.
 
@@ -96,7 +67,7 @@ Offline, region-restricted, or unsupported sources can have no playable links. B
 
 ## Sportsbite
 
-Version 6 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
+Version 3 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
 Sports includes the live/upcoming schedule, all listed sports and an Other Sports row.
 Live TV includes non-sports channels, category and country browsing, search and pagination.
 Matching channel names within the same country share a card and offer alternate servers.
@@ -162,7 +133,7 @@ Full repository URL (fallback):
 https://raw.githubusercontent.com/Steven3215/Caramelo/main/repo.json
 
 The shortcode redirects directly to this feed. Compiled downloads are published
-under `downloads/` and verified using the SHA-256 checksum in `plugins.json`.
+under downloads/ and verified using the SHA-256 checksum in plugins.json.
 
 ## Build and release updates
 
@@ -170,16 +141,10 @@ The GitHub Actions build workflow runs unit tests and packages a .cs3 artifact.
 It also runs a non-blocking live API and HLS playlist check using Night of the
 Living Dead (1968). Artifacts expire after seven days.
 
-To publish a new version:
-
-1. Commit the new `.cs3` files under `downloads/`.
-2. Update each changed entry in `plugins.json` with its version, file size, SHA-256 checksum and
-   a raw download URL pinned to the commit containing that package. Keep unchanged entries pinned.
-3. Commit `plugins.json`, then update `repo.json` to point to `plugins.json` at that commit. Verify
-   the published checksums using the exact download URLs in the feed.
-
-The repository URL and shortcode stay the same. Pinning each link keeps older cached lists
-paired with the packages they describe. The build workflow produces artifacts for manual publication.
+To publish a new version, replace the matching .cs3 file under downloads/ and update its version,
+fileSize and fileHash in plugins.json together. The feed URL and shortcode remain
+unchanged. The current build workflow produces artifacts; it does not automatically
+replace the published download.
 
 For local builds, first check out the public build plugin at
 `build-tools/cloudstream-gradle`, revision
