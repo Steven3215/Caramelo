@@ -156,5 +156,43 @@
     "language": "en",
     "fileSize": 29570,
     "fileHash": "sha256-762ae427ea85c4a4bd9a4b23023286225b6954375480e37a413f3c2130eb3180"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Teleonline.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "Teleonline",
+    "internalName": "Teleonline",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Worldwide live TV with selectable country and category rows. Direct broadcaster HLS. Availability varies by region. Device testing pending.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Live"
+    ],
+    "language": "es",
+    "fileSize": 36366,
+    "fileHash": "sha256-1d6e6dc3216183d74a64334b0df63a553914e8e09ed2193b809c65037426ce64"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/TeleLibre.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "Tele Libre",
+    "internalName": "TeleLibre",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "Live TV categories with tele-libre.top mirror fallback. Canal 24 Horas HLS verified. Some channels require unsupported encrypted players. Device testing pending.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Live"
+    ],
+    "language": "es",
+    "fileSize": 41811,
+    "fileHash": "sha256-f56e158dbf65da91227b5c1bbf2b0eecea7b1b3b4c246a633f6ba6ea69704af0"
   }
 ]

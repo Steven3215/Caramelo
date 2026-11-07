@@ -31,6 +31,15 @@ Native focusable controls support touch and D-pad navigation; the TV version doe
 focus the search keyboard. Existing preferences are retained. Refresh the source or restart Cloudstream
 after changing homepage rows. Shared selection logic has unit coverage; Android visual/device QA is pending.
 
+## Teleonline and Tele Libre
+
+Teleonline has channel search and selectable category and country rows. Country rows start off.
+Tele Libre has searchable categories. It uses tele-libre.top as a fallback for the matching directory.
+Both settings screens include Select all, Deselect all, Save and Cancel.
+Canal 24 Horas passed a public HLS media check through both providers. Some Teleonline streams
+are region restricted. Tele Libre supports direct HLS and the public RTVE embed path. Encrypted
+DASH players are unsupported. Age-gated categories are omitted. Android device checks are pending.
+
 ## Movy
 
 Movies and TV shows from https://www.movy.sx/, including paginated movie/TV/genre rows,
