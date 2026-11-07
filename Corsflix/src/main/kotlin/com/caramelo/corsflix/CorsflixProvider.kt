@@ -112,6 +112,16 @@ internal class CorsflixProvider(private val settings: CorsflixSettings) : MainAP
         val item = CorsflixProtocol.item(data)
         if (item.type == "tv" && item.episode == null) throw ErrorLoadingException("Choose an episode first")
         val found = linkedSetOf<String>()
+        suspend fun emit(link: String, server: String, referer: String?, requestHeaders: Map<String, String>) {
+            if (!CorsflixProtocol.webUrl(link) || link in found) return
+            val response = app.get(link, headers = requestHeaders, referer = referer, timeout = 12)
+            if (response.code !in 200..299 || !response.text.trimStart().startsWith("#EXTM3U")) return
+            found.add(link)
+            callback(newExtractorLink(name, "$name – $server", link, ExtractorLinkType.M3U8) {
+                this.referer = referer.orEmpty()
+                this.headers = requestHeaders
+            })
+        }
         if ("twoembed" in settings.servers()) try {
             val embed = if (item.type == "movie") "https://www.2embed.cc/embed/${item.id}"
                 else "https://www.2embed.cc/embedtv/${item.id}&s=${item.season}&e=${item.episode}"
@@ -127,10 +137,7 @@ internal class CorsflixProvider(private val settings: CorsflixSettings) : MainAP
                     val html = app.get(player, referer = inner, timeout = 15).text
                     val unpacked = getAndUnpack(html)
                     for (link in CorsflixProtocol.playlists(unpacked)) {
-                        if (!CorsflixProtocol.webUrl(link)) continue
-                        val response = app.get(link, headers = mapOf("Origin" to "https://2vcdn.skin"), referer = player, timeout = 12)
-                        if (response.code in 200..299 && response.text.trimStart().startsWith("#EXTM3U") && found.add(link))
-                            callback(newExtractorLink(name, "$name – 2Embed", link, ExtractorLinkType.M3U8) { referer = player })
+                        emit(link, "2Embed", player, mapOf("Origin" to "https://2vcdn.skin"))
                     }
                 }
             }
@@ -139,9 +146,13 @@ internal class CorsflixProvider(private val settings: CorsflixSettings) : MainAP
             val embed = "https://rivestream.ru/embed?type=${item.type}&id=${item.id}" +
                 (if (item.type == "tv") "&season=${item.season}&episode=${item.episode}" else "")
             val resolver = WebViewResolver(interceptUrl = Regex("\\.m3u8(?:[?#]|$)"), useOkhttp = false, timeout = 25000L)
-            val intercepted = app.get(embed, referer = "$mainUrl/", interceptor = resolver).url
-            if (CorsflixProtocol.webUrl(intercepted) && URI(intercepted).path.endsWith(".m3u8") && found.add(intercepted))
-                callback(newExtractorLink(name, "$name – Rive", intercepted, ExtractorLinkType.M3U8) { referer = embed })
+            val request = resolver.resolveUsingWebView(embed, referer = "$mainUrl/", headers = emptyMap()).first
+            if (request != null && request.method == "GET") {
+                val mediaHeaders = listOf("Origin", "User-Agent").mapNotNull { key ->
+                    request.header(key)?.let { key to it }
+                }.toMap()
+                emit(request.url.toString(), "Rive", request.header("Referer"), mediaHeaders)
+            }
         } catch (error: Exception) { if (error is CancellationException) throw error }
         if (found.isEmpty()) throw ErrorLoadingException("Corsflix's third-party players are unavailable. The Rive fallback requires Android WebView; try again later or another source.")
         return true

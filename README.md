@@ -16,7 +16,7 @@ Casting is unsupported. Other player hosts may not resolve. No account or video 
 
 **Corsflix** provides movies/TV, search, details, seasons and episodes using its own catalog API.
 Homepage and server settings are included. The listed 2Embed → StreamWish player chain is parsed,
-with an Android WebView fallback for the site's Rive embed. Catalog/embed metadata checks pass,
+with an Android WebView fallback for the site's Rive embed. Both routes validate the playlist with the playback headers. Catalog/embed metadata checks pass,
 but direct player CDN requests returned HTTP403 in manual testing. Full Android playback is unverified;
 this source remains beta and may have no working streams depending on the upstream player.
 
@@ -24,13 +24,38 @@ All three new extensions are beta-only (status 3); device playback and settings 
 
 ## Settings for phone, tablet and Android TV
 
-Sportsbite v3 and Global Free TV v2 have grouped settings menus, searchable category/country lists,
-selection counts, 56dp option rows and 52dp bulk controls. Select shown/Clear shown only change
-the filtered results, while preserving hidden selections. Save commits a draft; Cancel discards it.
+Sportsbite v5 and Global Free TV v3 have grouped settings menus, searchable category/country lists,
+selection counts, 56dp option rows and 52dp bulk controls. Select all/Deselect all change every option in the current list, including options hidden by search. Save commits a draft; Cancel discards it.
 Grouping and sort changes also use Save/Cancel. Country-filter screens include an All countries action.
 Native focusable controls support touch and D-pad navigation; the TV version does not automatically
 focus the search keyboard. Existing preferences are retained. Refresh the source or restart Cloudstream
 after changing homepage rows. Shared selection logic has unit coverage; Android visual/device QA is pending.
+
+## Lightflix, Moonflix, Nexa and SoloLatino
+
+All four providers include movie and series catalogs, search and episode lists.
+Moonflix resolves direct HLS links and handles MPEG-TS segments packaged in PNG chunks.
+A sample passed locally and in one hosted run. Direct source availability varies.
+Lightflix and Nexa have verified catalogs. SoloLatino resolved anonymous player embeds locally.
+These three use experimental Android WebView playback. Device playback remains unverified.
+
+## JustAnime and ThugTV
+
+JustAnime provides anime search, browse rows, and episode lists. Available playback links are
+labeled SUB or DUB. Server selection keeps checking for each advertised audio option until it finds a working link. Both audio options passed a live HLS media check.
+
+ThugTV provides movie and series catalogs, search, episodes, and native HLS sources. Homepage pagination skips repeated titles and continues when later pages offer new ones.
+A public-domain movie sample played through the HLS media check locally. The hosted runner
+received HTTP 403 from the catalog backend. Both extensions are beta and need device testing.
+
+## Teleonline and Tele Libre
+
+Teleonline has channel search and selectable category and country rows. Country rows start off.
+Tele Libre has searchable categories. It uses tele-libre.top as a fallback for the matching directory.
+Both settings screens include Select all, Deselect all, Save and Cancel.
+Canal 24 Horas passed a public HLS media check through both providers. Some Teleonline streams
+are region restricted. Tele Libre supports direct HLS and the public RTVE embed path. Encrypted
+DASH players are unsupported. Age-gated categories are omitted. Android device checks are pending.
 
 ## Movy
 
@@ -67,7 +92,7 @@ Offline, region-restricted, or unsupported sources can have no playable links. B
 
 ## Sportsbite
 
-Version 3 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
+Version 5 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
 Sports includes the live/upcoming schedule, all listed sports and an Other Sports row.
 Live TV includes non-sports channels, category and country browsing, search and pagination.
 Matching channel names within the same country share a card and offer alternate servers.

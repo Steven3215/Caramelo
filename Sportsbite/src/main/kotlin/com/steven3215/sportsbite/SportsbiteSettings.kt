@@ -31,7 +31,7 @@ internal class SportsbiteSettings(context: Context) {
         Toast.makeText(context, "Saved. Switch to another source and back, or restart Cloudstream to refresh homepage rows.", Toast.LENGTH_LONG).show()
     }
     private fun rows(context: Context, title: String, values: List<Pair<String, String>>, refresh: () -> Unit) {
-        SettingsUi.select(context, title, "Choose homepage rows. Search to find an option; bulk buttons affect only the shown results.",
+        SettingsUi.select(context, title, "Choose homepage rows. Select all and Deselect all affect the entire list, including hidden search results. Tap Save to apply.",
             values.map { SelectionItem(it.first, it.second) }, values.filter { enabled(it.first) }.map { it.first }.toSet(), { selected ->
                 val hidden = prefs.getStringSet("hidden_rows", emptySet()).orEmpty().toMutableSet()
                 values.forEach { if (it.first in selected) hidden.remove(it.first) else hidden.add(it.first) }
@@ -41,7 +41,7 @@ internal class SportsbiteSettings(context: Context) {
     private fun countryFilter(context: Context, refresh: () -> Unit) {
         val values = countries()
         val selected = if (flag("filter_countries", false)) prefs.getStringSet("allowed_countries", emptySet()).orEmpty() else values.toSet()
-        SettingsUi.select(context, "Country filter", "Applies to all Live TV rows and search. No selection shows no channels. All countries removes the filter.",
+        SettingsUi.select(context, "Country filter", "Applies to all Live TV rows and search. Bulk buttons affect every country. No selection shows no channels. All countries removes the filter.",
             values.map { SelectionItem(it, it) }, selected, { chosen ->
                 prefs.edit().putBoolean("filter_countries", true).putStringSet("allowed_countries", chosen).apply(); refresh(); saved(context)
             }, { prefs.edit().putBoolean("filter_countries", false).apply(); refresh(); saved(context) })
