@@ -16,7 +16,7 @@ Casting is unsupported. Other player hosts may not resolve. No account or video 
 
 **Corsflix** provides movies/TV, search, details, seasons and episodes using its own catalog API.
 Homepage and server settings are included. The listed 2Embed → StreamWish player chain is parsed,
-with an Android WebView fallback for the site's Rive embed. Catalog/embed metadata checks pass,
+with an Android WebView fallback for the site's Rive embed. Both routes validate the playlist with the playback headers. Catalog/embed metadata checks pass,
 but direct player CDN requests returned HTTP403 in manual testing. Full Android playback is unverified;
 this source remains beta and may have no working streams depending on the upstream player.
 
@@ -24,7 +24,7 @@ All three new extensions are beta-only (status 3); device playback and settings 
 
 ## Settings for phone, tablet and Android TV
 
-Sportsbite v4 and Global Free TV v3 have grouped settings menus, searchable category/country lists,
+Sportsbite v5 and Global Free TV v3 have grouped settings menus, searchable category/country lists,
 selection counts, 56dp option rows and 52dp bulk controls. Select all/Deselect all change every option in the current list, including options hidden by search. Save commits a draft; Cancel discards it.
 Grouping and sort changes also use Save/Cancel. Country-filter screens include an All countries action.
 Native focusable controls support touch and D-pad navigation; the TV version does not automatically
@@ -42,9 +42,9 @@ These three use experimental Android WebView playback. Device playback remains u
 ## JustAnime and ThugTV
 
 JustAnime provides anime search, browse rows, and episode lists. Available playback links are
-labeled SUB or DUB. Both audio options passed a live HLS media check.
+labeled SUB or DUB. Server selection keeps checking for each advertised audio option until it finds a working link. Both audio options passed a live HLS media check.
 
-ThugTV provides movie and series catalogs, search, episodes, and native HLS sources.
+ThugTV provides movie and series catalogs, search, episodes, and native HLS sources. Homepage pagination skips repeated titles and continues when later pages offer new ones.
 A public-domain movie sample played through the HLS media check locally. The hosted runner
 received HTTP 403 from the catalog backend. Both extensions are beta and need device testing.
 
@@ -92,7 +92,7 @@ Offline, region-restricted, or unsupported sources can have no playable links. B
 
 ## Sportsbite
 
-Version 4 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
+Version 5 registers **Sportsbite Sports** and **Sportsbite Live TV** from one extension.
 Sports includes the live/upcoming schedule, all listed sports and an Other Sports row.
 Live TV includes non-sports channels, category and country browsing, search and pagination.
 Matching channel names within the same country share a card and offer alternate servers.

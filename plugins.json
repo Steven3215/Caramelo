@@ -42,21 +42,21 @@
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Sportsbite.cs3",
     "status": 3,
-    "version": 4,
+    "version": 5,
     "apiVersion": 1,
     "name": "Sportsbite",
     "internalName": "Sportsbite",
     "authors": [
       "Caramelo"
     ],
-    "description": "Sports and Live TV with searchable category/country settings, Select all/Deselect all and saved filters. Touch and TV remote controls; device testing pending. Local playback.",
+    "description": "Sports and Live TV with selectable category and country rows. Verified feed headers are carried into playback. Local playback.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Live"
     ],
     "language": "en",
-    "fileSize": 56659,
-    "fileHash": "sha256-69af2a342bc5e6b41c5243f492ab05a011594f020c250056764ae78dd693d3df"
+    "fileSize": 61114,
+    "fileHash": "sha256-0cd9d973e5d86aed522871916a5aca4f42f186b4f2dd6f4a949f9e3aa8d81dff"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/GlobalFreeTV.cs3",
@@ -100,22 +100,22 @@
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Corsflix.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "Corsflix",
     "internalName": "Corsflix",
     "authors": [
       "Caramelo"
     ],
-    "description": "Experimental movie/TV catalog. Direct player returned HTTP 403; Android WebView fallback and playback are unverified.",
+    "description": "Experimental movie and TV catalog. Validates HLS with playback request headers. Direct CDN has returned HTTP 403. Android fallback testing pending.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Movie",
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 32015,
-    "fileHash": "sha256-032b55df795310f3e5a709d26406c7a1a3bac1a34408569f10c651a84c679486"
+    "fileSize": 32350,
+    "fileHash": "sha256-8dcb80d3a14a445ff21be2cdee4748459392c55c5b27b454513c893d053332e2"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Nekowatch.cs3",
@@ -198,42 +198,42 @@
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/JustAnime.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "JustAnime",
     "internalName": "JustAnime",
     "authors": [
       "Caramelo"
     ],
-    "description": "Anime home rows, search, real episodes and SUB/DUB HLS. Sample media verified. Device testing pending.",
+    "description": "Anime browse rows, search, episode lists and SUB/DUB HLS. Continues checking for each advertised audio option.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Anime",
       "AnimeMovie"
     ],
     "language": "en",
-    "fileSize": 21473,
-    "fileHash": "sha256-b5996af7410ac8390af6fca97f256e5b9ae40df3a2bf9379edec9f51badaa36c"
+    "fileSize": 23293,
+    "fileHash": "sha256-9f5e360d25e9ed7f04c99bb506d905c59053664911b97fe978eb46d566ab9ce2"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/ThugTV.cs3",
     "status": 3,
-    "version": 1,
+    "version": 2,
     "apiVersion": 1,
     "name": "ThugTV",
     "internalName": "ThugTV",
     "authors": [
       "Caramelo"
     ],
-    "description": "Movie and TV catalog, search and HLS. Local sample media passed. GitHub runner was blocked by HTTP 403. Device testing pending.",
+    "description": "Movie and TV catalog with homepage pagination that skips repeated titles. HLS availability varies by network.",
     "repositoryUrl": "https://github.com/Steven3215/Caramelo",
     "tvTypes": [
       "Movie",
       "TvSeries"
     ],
     "language": "en",
-    "fileSize": 22081,
-    "fileHash": "sha256-cb1976af68217ea535619a8352d9c2ffd768a910426d03d11b3664645a76b286"
+    "fileSize": 24842,
+    "fileHash": "sha256-ccf3081834c4e51cb66649f5304e9ddd475bd4cbcbb56463bdb7bf84df605e5c"
   },
   {
     "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/main/downloads/Lightflix.cs3",
