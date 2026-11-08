@@ -23,7 +23,7 @@ internal class VidBoxProvider : WebCatalog() {
 
     private val player = "https://vixsrc.to"
     private val playerHeaders = browser + ("Origin" to player)
-    private val playlistObject = Regex("""window\.masterPlaylist\s*=\s*\{\s*params:\s*\{([^}]*)}\s*,\s*url:\s*['"]([^'"]+)['"]""")
+    private val playlistObject = Regex("""window\.masterPlaylist\s*=\s*\{\s*params:\s*\{([^\}]*)\}\s*,\s*url:\s*['"]([^'"]+)['"]""")
     private val playlistParameter = Regex("""['"](token|expires|asn)['"]\s*:\s*['"]([^'"]+)['"]""")
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
