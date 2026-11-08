@@ -135,5 +135,45 @@
     "language": "es",
     "fileSize": 18382,
     "fileHash": "sha256-d5dcba2b44231508726f9cb67c9e85f564e6841752bb570305ad444f6a7f7724"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/2ca337323ac657e90533ac89507da52f6546f088/downloads/PrimeShows.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "PrimeShows",
+    "internalName": "PrimeShows",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "PrimeShows movies and TV with paginated browsing, search and HLS playback.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "language": "en",
+    "fileSize": 28493,
+    "fileHash": "sha256-e7d3d27f376784846a260cfd717373cc503c89cae86b159ed02520d19f0a22bb"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/2ca337323ac657e90533ac89507da52f6546f088/downloads/VidBox.cs3",
+    "status": 3,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "VidBox",
+    "internalName": "VidBox",
+    "authors": [
+      "Caramelo"
+    ],
+    "description": "VidBox movies and TV with paginated browsing, search and HLS playback.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "language": "en",
+    "fileSize": 24577,
+    "fileHash": "sha256-d938867a7e6150f0ccb87a40691e9767a223289dc3b04a03ff062239ee7faeac"
   }
 ]
