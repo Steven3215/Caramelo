@@ -50,6 +50,9 @@ subprojects {
             sourceSets.getByName("main").java.srcDir(rootProject.file("shared-settings/src/main/kotlin"))
             sourceSets.getByName("test").java.srcDir(rootProject.file("shared-settings/src/test/kotlin"))
         }
+        if (project.name in setOf("PrimeShows", "VidBox")) {
+            sourceSets.getByName("main").java.srcDir(rootProject.file("shared-web-catalog/src/main/kotlin"))
+        }
         namespace = "com.example"
 
         defaultConfig {
