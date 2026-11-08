@@ -76,7 +76,7 @@ internal abstract class WebCatalog : MainAPI() {
         }
     }
 
-    protected fun details(item: WebTitle, data: JsonNode, episodes: List<Episode> = emptyList()): LoadResponse {
+    protected suspend fun details(item: WebTitle, data: JsonNode, episodes: List<Episode> = emptyList()): LoadResponse {
         val label = title(data) ?: throw ErrorLoadingException("Title details unavailable.")
         val canonical = url(item.copy(season = null, episode = null))
         val tags = data.items("genres").mapNotNull { it.text("name") }
