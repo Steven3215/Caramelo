@@ -1,4 +1,4 @@
-version = 1
+version = 2
 cloudstream {
     description = "VidBox movies and TV with paginated browsing, search and HLS playback."
     authors = listOf("Caramelo")

@@ -3,23 +3,30 @@ package com.caramelo.vidbox
 import com.fasterxml.jackson.databind.JsonNode
 import com.caramelo.webcatalog.WebCatalog
 import com.caramelo.webcatalog.WebTitle
+import com.caramelo.webcatalog.WebSettings
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import org.jsoup.nodes.Document
 import java.net.URI
 
-internal class VidBoxProvider : WebCatalog() {
+internal class VidBoxProvider(private val preferences: WebSettings) : WebCatalog() {
     override var name = "VidBox"
     override var mainUrl = "https://vidbox.wtf"
     override val moviePath = "movie"
-    override val mainPage = mainPageOf(
-        "movie&trending=true" to "Trending Movies",
-        "tv&trending=true" to "Trending TV",
-        "movie" to "Popular Movies",
-        "tv" to "Popular TV",
-        "movie&genre=28" to "Action Movies",
-        "movie&genre=27" to "Horror Movies",
-    )
+    companion object {
+        val rows = linkedMapOf(
+            "movie&trending=true" to "Trending Movies",
+            "tv&trending=true" to "Trending TV",
+            "movie" to "Popular Movies",
+            "tv" to "Popular TV",
+            "movie&genre=28" to "Action Movies",
+            "movie&genre=27" to "Horror Movies",
+        )
+        val servers = listOf("Vidpro")
+    }
+
+    override val mainPage: List<MainPageData>
+        get() = rows.filterKeys(preferences::rowEnabled).map { (key, label) -> mainPage(key, label) }
 
     private val player = "https://vixsrc.to"
     private val playerHeaders = browser + ("Origin" to player)
@@ -27,6 +34,7 @@ internal class VidBoxProvider : WebCatalog() {
     private val playlistParameter = Regex("""['"](token|expires|asn)['"]\s*:\s*['"]([^'"]+)['"]""")
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+        if (!preferences.rowEnabled(request.data)) return newHomePageResponse(request, emptyList(), false)
         val body = json("$mainUrl/api/search/discover?type=${request.data}&page=$page")
         val type = request.data.substringBefore('&')
         return newHomePageResponse(request, body.items("results").mapNotNull { card(it, type) }, page < body.path("total_pages").asInt(page))
@@ -93,6 +101,9 @@ internal class VidBoxProvider : WebCatalog() {
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
         val item = parseTitle(data) ?: return false
         if (item.type == "tv" && (item.season == null || item.episode == null)) return false
+        if (!preferences.serverEnabled("Vidpro")) {
+            throw ErrorLoadingException("Enable Vidpro in VidBox extension settings.")
+        }
         val route = item.playbackPath
         val src = json("$player/api/$route", "$player/$route", playerHeaders).text("src") ?: return false
         val embed = URI("$player/").resolve(src)

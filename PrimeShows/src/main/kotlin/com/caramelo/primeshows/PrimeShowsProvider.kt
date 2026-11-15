@@ -3,6 +3,7 @@ package com.caramelo.primeshows
 import android.util.Base64
 import com.caramelo.webcatalog.WebCatalog
 import com.caramelo.webcatalog.WebTitle
+import com.caramelo.webcatalog.WebSettings
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import kotlinx.coroutines.async
@@ -14,17 +15,23 @@ import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-internal class PrimeShowsProvider : WebCatalog() {
+internal class PrimeShowsProvider(private val preferences: WebSettings) : WebCatalog() {
     override var name = "PrimeShows"
     override var mainUrl = "https://primeshows.org"
     override val moviePath = "movies"
-    override val mainPage = mainPageOf(
-        "/trending/movie/day" to "Trending Movies",
-        "/trending/tv/day" to "Trending TV",
-        "/movie/now_playing" to "Now Playing",
-        "/movie/top_rated" to "Top Rated Movies",
-        "/tv/popular" to "Popular TV",
-    )
+    companion object {
+        val rows = linkedMapOf(
+            "/trending/movie/day" to "Trending Movies",
+            "/trending/tv/day" to "Trending TV",
+            "/movie/now_playing" to "Now Playing",
+            "/movie/top_rated" to "Top Rated Movies",
+            "/tv/popular" to "Popular TV",
+        )
+        val servers = listOf("Nova", "Atlas", "Astra", "Orion", "Luna", "Lyra", "Hindi", "Tamil", "Telugu")
+    }
+
+    override val mainPage: List<MainPageData>
+        get() = rows.filterKeys(preferences::rowEnabled).map { (key, label) -> mainPage(key, label) }
 
     private val catalogGate = Semaphore(5)
     private val player = "https://vidrock.net"
@@ -35,6 +42,7 @@ internal class PrimeShowsProvider : WebCatalog() {
     }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+        if (!preferences.rowEnabled(request.data)) return newHomePageResponse(request, emptyList(), false)
         val body = catalog(request.data, "&page=$page")
         val type = if (request.data.startsWith("/tv/") || "/tv/" in request.data) "tv" else "movie"
         return newHomePageResponse(request, body.items("results").mapNotNull { card(it, type) }, page < body.path("total_pages").asInt(page))
@@ -87,12 +95,15 @@ internal class PrimeShowsProvider : WebCatalog() {
     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
         val item = parseTitle(data) ?: return false
         if (item.type == "tv" && (item.season == null || item.episode == null)) return false
+        if (servers.none(preferences::serverEnabled)) {
+            throw ErrorLoadingException("Enable a PrimeShows playback server in extension settings.")
+        }
         val path = item.playbackPath
         return coroutineScope {
             val subtitles = async { attempt { json("https://sub.vdrk.site/v2/$path", "$player/", playerHeaders) } }
             val body = json("$player/api/$path", "$player/$path", playerHeaders)
             val candidates = body.fields().asSequence().mapNotNull { (server, entry) ->
-                if (entry.text("type") != "hls") return@mapNotNull null
+                if (!preferences.serverEnabled(server) || entry.text("type") != "hls") return@mapNotNull null
                 val encoded = entry.text("url") ?: return@mapNotNull null
                 val playlist = runCatching { decodeStream(encoded) }.getOrNull() ?: return@mapNotNull null
                 val language = entry.text("language")
