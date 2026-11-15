@@ -35,25 +35,27 @@ internal class KuronoProvider(private val preferences: WebSettings) : WebCatalog
         return response.document
     }
 
-    private fun cards(doc: Document): List<SearchResponse> =
-        doc.select("a[href^=/series/], a[href^=/movies/]").mapNotNull { link ->
-            val path = titlePath.matchEntire(link.attr("href")) ?: return@mapNotNull null
-            val poster = link.selectFirst("img[alt]") ?: return@mapNotNull null
-            val title = poster.attr("alt").takeIf(String::isNotBlank) ?: return@mapNotNull null
-            val type = if (path.groupValues[1] == "movies") TvType.AnimeMovie else TvType.Anime
-            newAnimeSearchResponse(title, "$mainUrl${path.value}", type) { posterUrl = poster.absUrl("src") }
-        }.distinctBy { it.url }
+    private fun card(item: JsonNode): SearchResponse? {
+        val slug = item.text("slug")?.takeIf { it.matches(Regex("[a-z0-9-]+")) } ?: return null
+        val title = item.text("title") ?: return null
+        val movie = item.text("type").equals("Movie", true)
+        val category = if (movie) "movies" else "series"
+        return newAnimeSearchResponse(title, "$mainUrl/$category/$slug", if (movie) TvType.AnimeMovie else TvType.Anime) {
+            posterUrl = absolute(item.text("imgSeed"))
+        }
+    }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        if (page != 1 || request.data !in rows || !preferences.rowEnabled(request.data)) return newHomePageResponse(request, emptyList(), false)
-        return newHomePageResponse(request, cards(document("$mainUrl/browse?${request.data}")), false)
+        if (page < 1 || request.data !in rows || !preferences.rowEnabled(request.data)) return newHomePageResponse(request, emptyList(), false)
+        val body = json("$mainUrl/api/catalog-browse?${request.data}&page=$page")
+        val items = body.items("items")
+        return newHomePageResponse(request, items.mapNotNull(::card), items.isNotEmpty())
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val words = query.trim().split(Regex("\\s+")).filter(String::isNotBlank)
-        if (words.isEmpty()) return emptyList()
-        return cards(document("$mainUrl/browse?search=${encode(query.trim())}"))
-            .filter { result -> words.all { result.name.contains(it, ignoreCase = true) } }
+        if (query.isBlank()) return emptyList()
+        return json("$mainUrl/api/catalog-search?q=${encode(query.trim())}&limit=30").items("items")
+            .mapNotNull(::card).distinctBy { it.url }
     }
 
     private fun findDetails(node: JsonNode, slug: String): JsonNode? {
