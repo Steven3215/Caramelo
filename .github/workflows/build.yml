@@ -15,6 +15,7 @@ on:
       - 'VidBox/**'
       - 'ReAnime/**'
       - 'AniPm/**'
+      - 'AsiaFlix/**'
       - 'shared-web-catalog/**'
       - 'Corsflix/**'
       - 'shared-settings/**'
@@ -71,7 +72,7 @@ jobs:
         with:
           gradle-version: '8.12'
       - name: Unit tests and extension build
-        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make DominicanChannels:make PrimeShows:make VidBox:make ReAnime:make AniPm:make --stacktrace
+        run: gradle CinemaArmy:testDebugUnitTest UniqueStreamAnime:testDebugUnitTest Sportsbite:testDebugUnitTest GlobalFreeTV:testDebugUnitTest Movy:testDebugUnitTest Corsflix:testDebugUnitTest CinemaArmy:make UniqueStreamAnime:make Sportsbite:make GlobalFreeTV:make Movy:make Corsflix:make DominicanChannels:make PrimeShows:make VidBox:make ReAnime:make AniPm:make AsiaFlix:make --stacktrace
       - name: Save compiled extensions
         uses: actions/upload-artifact@v4
         with:
