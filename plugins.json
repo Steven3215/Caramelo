@@ -195,5 +195,25 @@
       "TvSeries"
     ],
     "language": "en"
+  },
+  {
+    "name": "Kurono",
+    "internalName": "Kurono",
+    "version": 1,
+    "apiVersion": 1,
+    "status": 3,
+    "fileSize": 30919,
+    "fileHash": "sha256-d462d749e0fd39ffbb5329e05d2987452931d96451558bd63ad562410581fd5f",
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/d97cddd7679247ccb26c88896c72b8df53267c97/downloads/Kurono.cs3",
+    "description": "Anime series and movies with configurable homepage rows and sub/dub playback.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "authors": [
+      "Caramelo"
+    ],
+    "tvTypes": [
+      "Anime",
+      "AnimeMovie"
+    ],
+    "language": "en"
   }
 ]
