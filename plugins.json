@@ -175,5 +175,25 @@
     "language": "en",
     "fileSize": 29659,
     "fileHash": "sha256-171c4cf9f6f72498aa0d205200e83248cf65d8a7c2f831bdb64357a2c7af8c2e"
+  },
+  {
+    "name": "AsiaFlix",
+    "internalName": "AsiaFlix",
+    "version": 1,
+    "apiVersion": 1,
+    "status": 3,
+    "fileSize": 32394,
+    "fileHash": "sha256-131de2e7e0cb899970ce14df38df8cc99adaf7c89c61b1a64c9f49050f5e93ff",
+    "url": "https://raw.githubusercontent.com/Steven3215/Caramelo/02bd10b03f00f554b09b5bbe334068eadd22c29f/downloads/AsiaFlix.cs3",
+    "description": "Asian movies and drama series with configurable country rows and playback servers.",
+    "repositoryUrl": "https://github.com/Steven3215/Caramelo",
+    "authors": [
+      "Caramelo"
+    ],
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "language": "en"
   }
 ]
